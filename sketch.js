@@ -1,6 +1,8 @@
 gameState ="menu";
 playerState = "idle";
 lastState = "low";
+lastAttack = "high";
+nextSprite=0;
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
@@ -67,18 +69,30 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
     "idle":[0,1,2],
     "low":[3,4,10],
     "medium":[5,6,10],
-    "high":[7,8,10]
+    "high":[7,8,10],
+    "low to high":[9,8,10]
   }
-  if(state!=lastState){
-    nextSprite=0;
-    lastState=state;
+  if(lastState!="idle" && state == "idle" && nextSprite<2){
+    state = lastState;
+    lastAttack = lastState;
+  }else{
+    if(lastAttack == "low" && state=="high"){
+      state = "low to high";
+      lastAttack = "low to high";
+      console.log("TRANSITIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNn");
+      nextSprite=0;
+    }else if(state!=lastState){
+      nextSprite=0;
+      lastState=state;
+    }
   }
-  if(frameCount%10==0){
-  image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
-  nextSprite++;
-  if(nextSprite/2 >1){
-    nextSprite=0;
-  }
+  if(frameCount%8==0){
+    console.log("Last state:",lastState," State:",state," Sprite:",animations[state][nextSprite]);
+    image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
+    nextSprite++;
+    if(nextSprite/2 >1){
+      nextSprite=0;
+    }
   }else{
     image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
   }
