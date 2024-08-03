@@ -73,6 +73,7 @@ function play() {
 
   //drawing hit circles/projectiles based on frame number
   renderNotes();
+  drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
 }
 
 function drawPlayer(state="idle", x=0, y=0, size=500) {
@@ -98,7 +99,7 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
       lastState=state;
     }
   }
-  if(frameCount%8==0){
+  if(frameCount%5==0){
     console.log("Last state:",lastState," State:",state," Sprite:",animations[state][nextSprite]);
     image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
     nextSprite++;
@@ -188,13 +189,12 @@ function handleInput(input){
 function renderNotes(){
   let hitCircleSize = 50;
   let hitCircleSpeed = 5;
-  line(width*0.3, height*0.1, width*0.3, height*0.9);
-  testNote=320;
+  line(width*0.35, height*0.1, width*0.35, height*0.9);
   fill("#bde0fe");
   for (let i = 0; i < 8; i++) {
     for (let testNote of notes[i]) {
-      if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
-        ellipse(width*0.3 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
+      if (testNote-songFrame > -10 && testNote-songFrame < width/hitCircleSpeed) {
+        ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
       }
     }
   }
