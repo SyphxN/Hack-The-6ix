@@ -8,24 +8,14 @@ score = 0;
 playerTimings = {50: 0, 100: 0, 300: 0}
 hitNotes = []
 
-config={
-  0:{"k":0,"m":0},
-  1:{"k":1,"m":1},
-  2:{"k":2,"m":2},
-  3:{"k":3,"m":3},
-  4:{"k":4,"m":4},
-  5:{"k":5,"m":5},
-  6:{"k":6,"m":6},
-  7:{"k":7,"m":7},
-}
-
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
 }
 
-function keyConfig(lane,type,newKey){
-  config[lane][type]=newKey;
-}
+// Define the arrays for k and m values
+const kValues = [0, 1, 2, 3, 4, 5, 6, 7];
+const mValues = [0, 1, 2, 3, 4, 5, 6, 7];
+
 
 function setup() {
   // fullscreen canvas
@@ -51,6 +41,11 @@ function draw() {
     case "play":
       play();
       break;
+    case "config":
+      kValues.splice(0, kValues.length);
+      mValues.splice(0,mValues.length);
+      gameState="menu";
+      break;
   }
 }
 
@@ -66,6 +61,12 @@ function menu() {
       songFrame = 0;
     }
     gameState = "play";
+  }
+  if (keyIsDown(51)){
+    print(kValues,mValues);
+  }
+  if (keyIsDown(50)){
+    gameState="config";
   }
 
   drawPlayer(playerState, mouseX, mouseY);
@@ -176,27 +177,35 @@ function handleMidiInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   if(noteEvent == 144){
+    if (mValues.length<8){
+      mValues.push(note);
+    }
     if (!currentNotes.includes(note)) {
       inputPressed(note);
     }
   } else  {
+    configMIDI=-1;
     inputReleased(note);
   }
 }
 
 function keyPressed(){
   //if key from 1-8
-  if (keyCode >= 49 && keyCode <= 56){
-    inputPressed(keyCode-49);
+  if (kValues.length<8){
+    kValues.push(keyCode);
+  }
+  if (kValues.includes(keyCode)){
+    inputPressed(kValues.indexOf(keyCode));
   }
 }
 
 function keyReleased(){
     //if key from 1-8
-    if (keyCode >= 49 && keyCode <= 56){
-      inputReleased(keyCode-49);
+    if (kValues.includes(keyCode)){
+      inputReleased(kValues.indexOf(keyCode));
     }
-}
+  }
+
 
 function inputPressed(note){ // merges both kb and midi input
   currentNotes.push(note);
