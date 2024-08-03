@@ -1,6 +1,10 @@
 gameState ="menu";
 playerState = "idle";
 
+if (navigator.requestMIDIAccess){
+  navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
+}
+
 function setup() {
   // fullscreen canvas
   createCanvas(windowWidth, windowHeight);
@@ -12,9 +16,6 @@ function setup() {
 function preload() {
   loadSprites();
   loadSong();
-  if (navigator.requestMIDIAccess){
-    navigator.requestMIDIAccess().then(midiAccessAllowed,failure)
-  }
 }
 
 function draw() {
@@ -65,12 +66,12 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
     case "idle":
       //range = [0,1,2]
       image(images[int(frameCount/15)%3], x-size*0.6, y-size*0.98, size*1.2,size);
-      console.log(int(frameCount/15)%3);
+      //console.log(int(frameCount/15)%3);
       break;
     case "low":
       //range = [3,4]
       image(images[int(frameCount/15)%2+3], x-size*0.6, y-size*0.98, size*1.2,size);
-      console.log(int(frameCount/15)%2);
+      //console.log(int(frameCount/15)%2);
       break;
     case "medium":
       //range = [5,6,7]
@@ -95,9 +96,9 @@ function loadSong() {
 }
 
 function midiAccessAllowed(midiAccess){
-  console.log(midiAccess);
+  //console.log(midiAccess);
   const inputs = midiAccess.inputs;
-  console.log(inputs);
+  //console.log(inputs);
 
   inputs.forEach((input) => {
       console.log(input);
@@ -109,7 +110,7 @@ function handleInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   const velocity = input.data[2];
-  console.log("")
+  console.log(note);
   if(noteEvent == 144){
     switch(note){
         case 44:
