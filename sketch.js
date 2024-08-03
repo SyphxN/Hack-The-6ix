@@ -74,9 +74,9 @@ function play() {
 }
 
 function drawPlayer(state="idle", x=0, y=0, size=500) {
-  if (currentNotes.includes(0) || currentNotes.includes(2)){
+  if (currentNotes.includes(6) || currentNotes.includes(7)){
     playerState="low";
-  }else if(currentNotes.includes(1)){
+  }else if(currentNotes.includes(3) || currentNotes.includes(4) || currentNotes.includes(5)){
     playerState = "medium";
   }else if(currentNotes.length == 0){
     playerState = "idle";
@@ -166,7 +166,7 @@ function handleMidiInput(input){
 function keyPressed(){
   //if key from 1-8
   if (keyCode >= 49 && keyCode <= 56){
-    currentNotes.push(keyCode-48);
+    currentNotes.push(keyCode-49);
     console.log(currentNotes);
   }
 }
@@ -175,7 +175,7 @@ function keyReleased(){
     //if key from 1-8
     if (keyCode >= 49 && keyCode <= 56){
       //remove element from list
-      currentNotes = currentNotes.filter(n => n != keyCode-48);
+      currentNotes = currentNotes.filter(n => n != keyCode-49);
     }
 }
 
@@ -202,6 +202,9 @@ function gameplayGUI(){
     fill(255);
     rect(0, rectHeight * (i+1), width, rectHeight);
     fill(colors[i]);
+    if (currentNotes.includes(i)) {
+      fill(255,0,0);
+    }
     ellipse(width*0.36,height*0.1*i+height*0.15, 55, 55);
   }
 }
