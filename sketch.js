@@ -5,8 +5,23 @@ lastAttack = "high";
 nextSprite=0;
 currentNotes=[];
 
+config={
+  0:{"k":0,"m":0},
+  1:{"k":1,"m":1},
+  2:{"k":2,"m":2},
+  3:{"k":3,"m":3},
+  4:{"k":4,"m":4},
+  5:{"k":5,"m":5},
+  6:{"k":6,"m":6},
+  7:{"k":7,"m":7},
+}
+
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
+}
+
+function keyConfig(lane,type,newKey){
+  config[lane][type]=newKey;
 }
 
 function setup() {
@@ -56,6 +71,7 @@ function play() {
     song.play();
   }
   image(bg, 0, 0, width, height);
+  background(0,0,0,100)
   songFrame++;
 
   //show song frame counter
