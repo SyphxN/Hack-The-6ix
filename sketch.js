@@ -179,13 +179,13 @@ function handleMidiInput(input){
   if(noteEvent == 144){
     if (mValues.length<8){
       mValues.push(note);
+      console.log(mValues);
     }
     if (!currentNotes.includes(note)) {
-      inputPressed(note);
+      inputPressed(mValues.indexOf(note));
     }
   } else  {
-    configMIDI=-1;
-    inputReleased(note);
+    inputReleased(mValues.indexOf(note));
   }
 }
 
@@ -193,6 +193,7 @@ function keyPressed(){
   //if key from 1-8
   if (kValues.length<8){
     kValues.push(keyCode);
+    console.log(kValues);
   }
   if (kValues.includes(keyCode)){
     inputPressed(kValues.indexOf(keyCode));
