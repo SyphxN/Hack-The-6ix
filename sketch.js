@@ -1,5 +1,6 @@
 gameState ="menu";
 playerState = "idle";
+lastState = "low";
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
@@ -62,25 +63,24 @@ function play() {
 
 function drawPlayer(state="idle", x=0, y=0, size=500) {
   //draws player from bottom right foot
-  switch (state) {
-    case "idle":
-      //range = [0,1,2]
-      image(images[int(frameCount/15)%3], x-size*0.6, y-size*0.98, size*1.2,size);
-      //console.log(int(frameCount/15)%3);
-      break;
-    case "low":
-      //range = [3,4]
-      image(images[int(frameCount/15)%2+3], x-size*0.6, y-size*0.98, size*1.2,size);
-      //console.log(int(frameCount/15)%2);
-      break;
-    case "medium":
-      //range = [5,6,7]
-      image(images[int(frameCount/15)%3+5], x-size*0.6, y-size*0.98, size*1.2,size);
-      break;
-    case "high":
-      //range = [8,9,10]
-      image(images[int(frameCount/15)%3+8], x-size*0.6, y-size*0.98, size*1.2,size);
-      break;
+  var animations = {
+    "idle":[0,1,2],
+    "low":[3,4,10],
+    "medium":[5,6,10],
+    "high":[7,8,10]
+  }
+  if(state!=lastState){
+    nextSprite=0;
+    lastState=state;
+  }
+  if(frameCount%10==0){
+  image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
+  nextSprite++;
+  if(nextSprite/2 >1){
+    nextSprite=0;
+  }
+  }else{
+    image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
   }
 }
 
@@ -139,7 +139,7 @@ function handleInput(input){
             break;
         case 51:
             console.log("RIDE");
-            playerState="idle";
+            playerState="high";
             break;
         case 47:
           console.log("CLOSED HI-HAT");
