@@ -1,6 +1,9 @@
 gameState ="menu";
 playerState = "idle";
 lastState = "low";
+lastAttack = "high";
+nextSprite=0;
+currentNotes=[];
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
@@ -43,7 +46,7 @@ function menu() {
       songFrame = 0;
     }
     gameState = "play";
-  }else 
+  }
 
   drawPlayer(playerState, mouseX, mouseY);
 }
@@ -60,18 +63,11 @@ function play() {
   fill(0)
   textSize(32);
   text("time: " + songFrame, 10, 30);
-
-  /*lanes
-  let colors = [255,255,255,255,255,255,255,255];
-  let rectHeight = height * 0.1;
-  for (let i = 0; i < colors.length; i++) {
-    fill(colors[i]);
-    rect(0, rectHeight * (i+1), width, rectHeight);
-  }
-    */
+  
 
   //drawing hit circles/projectiles based on frame number
   renderNotes();
+  drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
 }
 
 function drawPlayer(state="idle", x=0, y=0, size=500) {
@@ -80,13 +76,25 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
     "idle":[0,1,2],
     "low":[3,4,10],
     "medium":[5,6,10],
-    "high":[7,8,10]
+    "high":[7,8,10],
+    "low to high":[9,8,10]
   }
-  if(state!=lastState){
-    nextSprite=0;
-    lastState=state;
+  if(lastState!="idle" && state == "idle" && nextSprite<2){
+    state = lastState;
+    lastAttack = lastState;
+  }else{
+    if(lastAttack == "low" && state=="high"){
+      state = "low to high";
+      lastAttack = "low to high";
+      console.log("TRANSITIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNn");
+      nextSprite=0;
+    }else if(state!=lastState){
+      nextSprite=0;
+      lastState=state;
+    }
   }
-  if(frameCount%10==0){
+  if(frameCount%5==0){
+    console.log("Last state:",lastState," State:",state," Sprite:",animations[state][nextSprite]);
     image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
     nextSprite++;
     if(nextSprite/2 >1){
@@ -130,66 +138,58 @@ function midiAccessAllowed(midiAccess){
       input.onmidimessage = handleInput;
   });
 }
-
 function handleInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   const velocity = input.data[2];
   console.log(note);
   if(noteEvent == 144){
-    switch(note){
-        case 44:
-            console.log("KICK");
-            playerState = "low";
-            break;
-        case 46:
-            console.log("FLOOR TOM");
-            playerState ="low";
-            break;
-        case 45:
-            console.log("SNARE");
-            playerState = "medium";
-            break;
-        case 49:
-            console.log("HIGH TOM");
-            playerState = "high";
-            break;
-        case 48:
-            console.log("CRASH");
-            playerState="high";
-            break;
-        case 50:
-            console.log("OPEN HI-HAT");
-            playerState ="high";
-            break;
-        case 51:
-            console.log("RIDE");
-            playerState="high";
-            break;
-        case 47:
-          console.log("CLOSED HI-HAT");
-          playerState = "high";
-          break;
+    if (!currentNotes.includes(note)) {
+      currentNotes.push(note);
     }
-  } else{
-    playerState="idle";
+    console.log(currentNotes);
+
+  }else{
+    currentNotes = currentNotes.filter(n => n != note);
   }
+  if (currentNotes.includes(44) || currentNotes.includes(46)){
+    playerState="low";
+  }else if(currentNotes.includes(45)){
+    playerState = "medium";
+  }else if(currentNotes.length == 0){
+    playerState = "idle";
+  }else{
+    playerState = "high";
+  }
+  
 }
 
 function renderNotes(){
+  gameplayGUI();
   let hitCircleSize = 50;
   let hitCircleSpeed = approachRate*3;
-  line(width*0.3, height*0.1, width*0.3, height*0.9);
   fill("#bde0fe");
   console.log();
   for (let i = 0; i < columnCount; i++) {
     for (let testNote of notes[i]) {
-      if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
-        ellipse(width*0.3 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
+      if (testNote-songFrame > -10 && testNote-songFrame < width/hitCircleSpeed) {
+        ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
       }
     }
   }
   
+}
+
+function gameplayGUI(){
+  line(width*0.35, height*0.1, width*0.35, height*0.9);
+  let colors = [255,255,255,255,255,255,255,255];
+  let rectHeight = height * 0.1;
+  for (let i = 0; i < colors.length; i++) {
+    fill(255);
+    rect(0, rectHeight * (i+1), width, rectHeight);
+    fill(colors[i]);
+    ellipse(width*0.36,height*0.1*i+height*0.15, 55, 55);
+  }
 }
 
 function midiAccessDenied(){
