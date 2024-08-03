@@ -2,8 +2,11 @@ gameState ="menu";
 playerState = "idle";
 lastState = "low";
 lastAttack = "high";
-nextSprite=0;
-currentNotes=[];
+nextSprite = 0;
+currentNotes = [];
+score = 0;
+playerTimings = {50: 0, 100: 0, 300: 0}
+hitNotes = []
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
@@ -15,6 +18,9 @@ function setup() {
   fps = 60;
   frameRate(fps);
   loadSong();
+  score = 0;
+  playerTimings = {50: 0, 100: 0, 300: 0}
+  hitNotes = []
 }
 
 function preload() {
@@ -69,7 +75,7 @@ function play() {
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
 
   // process input hit timing
-
+  
 
 }
 
@@ -153,53 +159,63 @@ function midiAccessAllowed(midiAccess){
 function handleMidiInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
-  const velocity = input.data[2];
   if(noteEvent == 144){
     if (!currentNotes.includes(note)) {
-      currentNotes.push(note);
+      inputPressed(note);
     }
-  }else{
-    currentNotes = currentNotes.filter(n => n != note);
+  } else  {
+    inputReleased(note);
   }
-  console.log(currentNotes);
 }
 
 function keyPressed(){
   //if key from 1-8
   if (keyCode >= 49 && keyCode <= 56){
-    currentNotes.push(keyCode-49);
-    console.log(currentNotes);
+    inputPressed(keyCode-49);
   }
 }
 
 function keyReleased(){
     //if key from 1-8
     if (keyCode >= 49 && keyCode <= 56){
-      //remove element from list
-      currentNotes = currentNotes.filter(n => n != keyCode-49);
+      inputReleased(keyCode-49);
     }
+}
+
+function inputPressed(note){ // merges both kb and midi input
+  currentNotes.push(note);
+  console.log("pressed: "+ note);
+  console.log(currentNotes);
+}
+
+function inputReleased(note){ // merges both kb and midi input
+  currentNotes = currentNotes.filter(n => n != note);
+  console.log("released: "+ note);
+  console.log(currentNotes);
 }
 
 function renderNotes(){
   gameplayGUI();
   let hitCircleSize = 50;
   let hitCircleSpeed = approachRate*3;
+
+  let frame_duration = 1000 / fps;
+  let hitWindow = 0;
+  
   for (let i = 0; i < columnCount; i++) {
     for (let testNote of notes[i]) {
       if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
         stroke(0)
         fill(189, 224, 254);
         ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
-      }
-
-      //transparent fade out
-      if (testNote-songFrame > -10 && testNote-songFrame <= 0) {
+      } else if (testNote-songFrame > -10 && testNote-songFrame <= 0) { //transparent fade out
         alpha = map(testNote-songFrame, -10, 0, 0, 255);
         fill(189, 224, 254,alpha);
         stroke(0,alpha)
         ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
       }
 
+      // if (testNote-songFrame)
     }
   }
 
