@@ -55,7 +55,7 @@ function play() {
   if (!song.isPlaying()) {
     song.play();
   }
-  background(255)
+  image(bg, 0, 0, width, height);
   songFrame++;
 
   //show song frame counter
@@ -126,7 +126,8 @@ function loadSprites() {
 function preloadSong() {
   song = loadSound("assets/song/audio.mp3");
   // preloadNotes = loadStrings("assets/song/notes.txt")
-  jsonData = loadJSON("assets/song/Turbo - PADORU  PADORU (PokeSky) [PADORU].osu.json");
+  jsonData = loadJSON("assets/song/map.json");
+  bg = loadImage("assets/song/bg.jpg");
 }
 
 function loadSong(){ //secondary parse bc preloadSong() is async
@@ -183,15 +184,25 @@ function renderNotes(){
   gameplayGUI();
   let hitCircleSize = 50;
   let hitCircleSpeed = approachRate*3;
-  fill("#bde0fe");
   for (let i = 0; i < columnCount; i++) {
     for (let testNote of notes[i]) {
-      if (testNote-songFrame > -10 && testNote-songFrame < width/hitCircleSpeed) {
+      if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
+        stroke(0)
+        fill(189, 224, 254);
         ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
       }
+
+      //transparent fade out
+      if (testNote-songFrame > -10 && testNote-songFrame <= 0) {
+        alpha = map(testNote-songFrame, -10, 0, 0, 255);
+        fill(189, 224, 254,alpha);
+        stroke(0,alpha)
+        ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
+      }
+
     }
   }
-  
+
 }
 
 function gameplayGUI(){
@@ -199,13 +210,13 @@ function gameplayGUI(){
   let colors = [255,255,255,255,255,255,255,255];
   let rectHeight = height * 0.1;
   for (let i = 0; i < colors.length; i++) {
-    fill(255);
-    rect(0, rectHeight * (i+1), width, rectHeight);
+    fill(255,100);
+    //rect(width*0.35, rectHeight * (i+1), width, rectHeight);
     fill(colors[i]);
     if (currentNotes.includes(i)) {
       fill(255,0,0);
     }
-    ellipse(width*0.36,height*0.1*i+height*0.15, 55, 55);
+    ellipse(width*0.35,height*0.1*i+height*0.15, 55, 55);
   }
 }
 
