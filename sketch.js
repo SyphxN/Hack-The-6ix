@@ -67,9 +67,22 @@ function play() {
   //drawing hit circles/projectiles based on frame number
   renderNotes();
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
+
+  // process input hit timing
+
+
 }
 
 function drawPlayer(state="idle", x=0, y=0, size=500) {
+  if (currentNotes.includes(0) || currentNotes.includes(2)){
+    playerState="low";
+  }else if(currentNotes.includes(1)){
+    playerState = "medium";
+  }else if(currentNotes.length == 0){
+    playerState = "idle";
+  }else{
+    playerState = "high";
+  }
   //draws player from bottom right foot
   var animations = {
     "idle":[0,1,2],
@@ -132,33 +145,38 @@ function midiAccessAllowed(midiAccess){
   //console.log(inputs);
 
   inputs.forEach((input) => {
-      input.onmidimessage = handleInput;
+      input.onmidimessage = handleMidiInput;
   });
 }
-function handleInput(input){
+
+function handleMidiInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   const velocity = input.data[2];
-  // console.log(note);
   if(noteEvent == 144){
     if (!currentNotes.includes(note)) {
       currentNotes.push(note);
     }
-    // console.log(currentNotes);
-
   }else{
     currentNotes = currentNotes.filter(n => n != note);
   }
-  if (currentNotes.includes(44) || currentNotes.includes(46)){
-    playerState="low";
-  }else if(currentNotes.includes(45)){
-    playerState = "medium";
-  }else if(currentNotes.length == 0){
-    playerState = "idle";
-  }else{
-    playerState = "high";
+  console.log(currentNotes);
+}
+
+function keyPressed(){
+  //if key from 1-8
+  if (keyCode >= 49 && keyCode <= 56){
+    currentNotes.push(keyCode-48);
+    console.log(currentNotes);
   }
-  
+}
+
+function keyReleased(){
+    //if key from 1-8
+    if (keyCode >= 49 && keyCode <= 56){
+      //remove element from list
+      currentNotes = currentNotes.filter(n => n != keyCode-48);
+    }
 }
 
 function renderNotes(){
