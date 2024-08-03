@@ -15,7 +15,6 @@ function setup() {
   fps = 60;
   frameRate(fps);
   loadSong();
-  console.log(notes);
 }
 
 function preload() {
@@ -86,7 +85,6 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
     if(lastAttack == "low" && state=="high"){
       state = "low to high";
       lastAttack = "low to high";
-      console.log("TRANSITIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNn");
       nextSprite=0;
     }else if(state!=lastState){
       nextSprite=0;
@@ -94,7 +92,7 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
     }
   }
   if(frameCount%5==0){
-    console.log("Last state:",lastState," State:",state," Sprite:",animations[state][nextSprite]);
+    // console.log("Last state:",lastState," State:",state," Sprite:",animations[state][nextSprite]);
     image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
     nextSprite++;
     if(nextSprite/2 >1){
@@ -134,7 +132,6 @@ function midiAccessAllowed(midiAccess){
   //console.log(inputs);
 
   inputs.forEach((input) => {
-      console.log(input);
       input.onmidimessage = handleInput;
   });
 }
@@ -142,12 +139,12 @@ function handleInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   const velocity = input.data[2];
-  console.log(note);
+  // console.log(note);
   if(noteEvent == 144){
     if (!currentNotes.includes(note)) {
       currentNotes.push(note);
     }
-    console.log(currentNotes);
+    // console.log(currentNotes);
 
   }else{
     currentNotes = currentNotes.filter(n => n != note);
@@ -169,7 +166,6 @@ function renderNotes(){
   let hitCircleSize = 50;
   let hitCircleSpeed = approachRate*3;
   fill("#bde0fe");
-  console.log();
   for (let i = 0; i < columnCount; i++) {
     for (let testNote of notes[i]) {
       if (testNote-songFrame > -10 && testNote-songFrame < width/hitCircleSpeed) {
