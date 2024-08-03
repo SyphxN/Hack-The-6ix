@@ -45,7 +45,7 @@ function menu() {
       songFrame = 0;
     }
     gameState = "play";
-  }else 
+  }
 
   drawPlayer(playerState, mouseX,mouseY);
 }
@@ -62,15 +62,7 @@ function play() {
   fill(0)
   textSize(32);
   text("time: " + songFrame, 10, 30);
-
-  /*lanes
-  let colors = [255,255,255,255,255,255,255,255];
-  let rectHeight = height * 0.1;
-  for (let i = 0; i < colors.length; i++) {
-    fill(colors[i]);
-    rect(0, rectHeight * (i+1), width, rectHeight);
-  }
-    */
+  
 
   //drawing hit circles/projectiles based on frame number
   renderNotes();
@@ -168,9 +160,10 @@ function handleInput(input){
 }
 
 function renderNotes(){
+  gameplayGUI();
   let hitCircleSize = 50;
   let hitCircleSpeed = 5;
-  line(width*0.35, height*0.1, width*0.35, height*0.9);
+
   fill("#bde0fe");
   for (let i = 0; i < 8; i++) {
     for (let testNote of notes[i]) {
@@ -180,6 +173,18 @@ function renderNotes(){
     }
   }
   
+}
+
+function gameplayGUI(){
+  line(width*0.35, height*0.1, width*0.35, height*0.9);
+  let colors = [255,255,255,255,255,255,255,255];
+  let rectHeight = height * 0.1;
+  for (let i = 0; i < colors.length; i++) {
+    fill(255);
+    rect(0, rectHeight * (i+1), width, rectHeight);
+    fill(colors[i]);
+    ellipse(width*0.36,height*0.1*i+height*0.15, 55, 55);
+  }
 }
 
 function midiAccessDenied(){
