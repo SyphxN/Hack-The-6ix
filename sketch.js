@@ -10,12 +10,12 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   fps = 60;
   frameRate(fps);
-  
+  loadSong();
 }
 
 function preload() {
   loadSprites();
-  loadSong();
+  preloadSong();
 }
 
 function draw() {
@@ -35,29 +35,41 @@ function menu() {
   text("1 for low", 10, 30);
   text("2 for medium", 10, 60);
   text("3 for high", 10, 90);
-  /*
   //1 is pressed
   if (keyIsDown(49)){
-    playerState ="low";
+    if (gamestate = "menu"){
+      songFrame = 0;
+    }
+    gameState = "play";
   }else 
-  //2 is pressed
-  if (keyIsDown(50)){
-    playerState ="medium";
-  } else
-  //3 is pressed
-  if (keyIsDown(51)){
-    playerState ="high";
-  } else 
-  //Default/Idle
-  {
-    playerState ="idle";
-  }
-    */
+
   drawPlayer(playerState, mouseX,mouseY);
 }
 
 function play() {
-  background(255);
+  //plays for first time
+  if (!song.isPlaying()) {
+    song.play();
+  }
+  background(255)
+  songFrame++;
+
+  //show song frame counter
+  fill(0)
+  textSize(32);
+  text("time: " + songFrame, 10, 30);
+
+  /*lanes
+  let colors = [255,255,255,255,255,255,255,255];
+  let rectHeight = height * 0.1;
+  for (let i = 0; i < colors.length; i++) {
+    fill(colors[i]);
+    rect(0, rectHeight * (i+1), width, rectHeight);
+  }
+    */
+
+  //drawing hit circles/projectiles based on frame number
+  renderNotes();
 }
 
 function drawPlayer(state="idle", x=0, y=0, size=500) {
@@ -91,10 +103,18 @@ function loadSprites() {
   }
 }
 
-function loadSong() {
-  song = loadSound("assets/audio.mp3");
+function preloadSong() {
+  song = loadSound("assets/song/audio.mp3");
+  preloadNotes = loadStrings("assets/song/notes.txt");
 }
 
+function loadSong(){ //secondary parse bc preloadSong() is async
+  notes = [];
+  for (let line of preloadNotes) {
+    let note = int(line.split(","));
+    notes.push(note);
+  }
+}
 function midiAccessAllowed(midiAccess){
   //console.log(midiAccess);
   const inputs = midiAccess.inputs;
@@ -146,9 +166,25 @@ function handleInput(input){
           playerState = "high";
           break;
     }
-  }else{
+  } else{
     playerState="idle";
   }
+}
+
+function renderNotes(){
+  let hitCircleSize = 50;
+  let hitCircleSpeed = 5;
+  line(width*0.3, height*0.1, width*0.3, height*0.9);
+  testNote=320;
+  fill("#bde0fe");
+  for (let i = 0; i < 8; i++) {
+    for (let testNote of notes[i]) {
+      if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
+        ellipse(width*0.3 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
+      }
+    }
+  }
+  
 }
 
 function midiAccessDenied(){
