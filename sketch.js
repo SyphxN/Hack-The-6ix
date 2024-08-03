@@ -1,69 +1,6 @@
 gameState ="menu";
 playerState = "idle";
 
-if (navigator.requestMIDIAccess){
-  navigator.requestMIDIAccess().then(success,failure)
-}
-
-function success(midiAccess){
-  console.log(midiAccess);
-  const inputs = midiAccess.inputs;
-  console.log(inputs);
-
-  inputs.forEach((input) => {
-      console.log(input);
-      input.onmidimessage = handleInput;
-  });
-}
-
-function handleInput(input){
-  const noteEvent = input.data[0];
-  const note = input.data[1];
-  const velocity = input.data[2];
-  if(noteEvent == 144){
-    switch(note){
-        case 44:
-            console.log("KICK");
-            playerState = "low";
-            break;
-        case 46:
-            console.log("FLOOR TOM");
-            playerState ="low";
-            break;
-        case 45:
-            console.log("SNARE");
-            playerState = "medium";
-            break;
-        case 49:
-            console.log("HIGH TOM");
-            playerState = "high";
-            break;
-        case 48:
-            console.log("CRASH");
-            playerState="high";
-            break;
-        case 50:
-            console.log("OPEN HI-HAT");
-            playerState ="high";
-            break;
-        case 51:
-            console.log("RIDE");
-            playerState="idle";
-            break;
-        case 47:
-          console.log("CLOSED HI-HAT");
-          playerState = "high";
-          break;
-    }
-  }else{
-    playerState="idle";
-  }
-}
-
-function failure(){
-  console.log("Could not connect to any midi device.")
-}
-
 function setup() {
   // fullscreen canvas
   createCanvas(windowWidth, windowHeight);
@@ -75,6 +12,9 @@ function setup() {
 function preload() {
   loadSprites();
   loadSong();
+  if (navigator.requestMIDIAccess){
+    navigator.requestMIDIAccess().then(midiAccessAllowed,failure)
+  }
 }
 
 function draw() {
@@ -125,10 +65,12 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
     case "idle":
       //range = [0,1,2]
       image(images[int(frameCount/15)%3], x-size*0.6, y-size*0.98, size*1.2,size);
+      console.log(int(frameCount/15)%3);
       break;
     case "low":
       //range = [3,4]
       image(images[int(frameCount/15)%2+3], x-size*0.6, y-size*0.98, size*1.2,size);
+      console.log(int(frameCount/15)%2);
       break;
     case "medium":
       //range = [5,6,7]
@@ -150,4 +92,64 @@ function loadSprites() {
 
 function loadSong() {
   song = loadSound("assets/audio.mp3");
+}
+
+function midiAccessAllowed(midiAccess){
+  console.log(midiAccess);
+  const inputs = midiAccess.inputs;
+  console.log(inputs);
+
+  inputs.forEach((input) => {
+      console.log(input);
+      input.onmidimessage = handleInput;
+  });
+}
+
+function handleInput(input){
+  const noteEvent = input.data[0];
+  const note = input.data[1];
+  const velocity = input.data[2];
+  console.log("")
+  if(noteEvent == 144){
+    switch(note){
+        case 44:
+            console.log("KICK");
+            playerState = "low";
+            break;
+        case 46:
+            console.log("FLOOR TOM");
+            playerState ="low";
+            break;
+        case 45:
+            console.log("SNARE");
+            playerState = "medium";
+            break;
+        case 49:
+            console.log("HIGH TOM");
+            playerState = "high";
+            break;
+        case 48:
+            console.log("CRASH");
+            playerState="high";
+            break;
+        case 50:
+            console.log("OPEN HI-HAT");
+            playerState ="high";
+            break;
+        case 51:
+            console.log("RIDE");
+            playerState="idle";
+            break;
+        case 47:
+          console.log("CLOSED HI-HAT");
+          playerState = "high";
+          break;
+    }
+  }else{
+    playerState="idle";
+  }
+}
+
+function midiAccessDenied(){
+  console.log("Could not connect to any midi device.")
 }
