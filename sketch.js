@@ -12,6 +12,7 @@ function setup() {
   fps = 60;
   frameRate(fps);
   loadSong();
+  console.log(notes);
 }
 
 function preload() {
@@ -44,7 +45,7 @@ function menu() {
     gameState = "play";
   }else 
 
-  drawPlayer(playerState, mouseX,mouseY);
+  drawPlayer(playerState, mouseX, mouseY);
 }
 
 function play() {
@@ -86,12 +87,12 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
     lastState=state;
   }
   if(frameCount%10==0){
-  image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
-  nextSprite++;
-  if(nextSprite/2 >1){
-    nextSprite=0;
-  }
-  }else{
+    image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
+    nextSprite++;
+    if(nextSprite/2 >1){
+      nextSprite=0;
+    }
+  } else {
     image(images[animations[state][nextSprite]], x-size*0.6, y-size*0.98, size*1.2,size);
   }
 }
@@ -105,15 +106,19 @@ function loadSprites() {
 
 function preloadSong() {
   song = loadSound("assets/song/audio.mp3");
-  preloadNotes = loadStrings("assets/song/notes.txt");
+  // preloadNotes = loadStrings("assets/song/notes.txt")
+  jsonData = loadJSON("assets/song/Turbo - PADORU  PADORU (PokeSky) [PADORU].osu.json");
 }
 
 function loadSong(){ //secondary parse bc preloadSong() is async
-  notes = [];
-  for (let line of preloadNotes) {
-    let note = int(line.split(","));
-    notes.push(note);
-  }
+  // notes = [];
+  // for (let line of preloadNotes) {
+  //   let note = int(line.split(","));
+  //   notes.push(note);
+  // }
+  notes = jsonData.rows;
+  approachRate = jsonData.approachRate;
+  columnCount = jsonData.columnCount;
 }
 function midiAccessAllowed(midiAccess){
   //console.log(midiAccess);
@@ -173,11 +178,11 @@ function handleInput(input){
 
 function renderNotes(){
   let hitCircleSize = 50;
-  let hitCircleSpeed = 5;
+  let hitCircleSpeed = approachRate*3;
   line(width*0.3, height*0.1, width*0.3, height*0.9);
-  testNote=320;
   fill("#bde0fe");
-  for (let i = 0; i < 8; i++) {
+  console.log();
+  for (let i = 0; i < columnCount; i++) {
     for (let testNote of notes[i]) {
       if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
         ellipse(width*0.3 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
