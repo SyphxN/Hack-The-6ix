@@ -3,6 +3,7 @@ playerState = "idle";
 lastState = "low";
 lastAttack = "high";
 nextSprite=0;
+currentNotes=[];
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
@@ -140,50 +141,30 @@ function midiAccessAllowed(midiAccess){
       input.onmidimessage = handleInput;
   });
 }
-
 function handleInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   const velocity = input.data[2];
   console.log(note);
   if(noteEvent == 144){
-    switch(note){
-        case 44:
-            console.log("KICK");
-            playerState = "low";
-            break;
-        case 46:
-            console.log("FLOOR TOM");
-            playerState ="low";
-            break;
-        case 45:
-            console.log("SNARE");
-            playerState = "medium";
-            break;
-        case 49:
-            console.log("HIGH TOM");
-            playerState = "high";
-            break;
-        case 48:
-            console.log("CRASH");
-            playerState="high";
-            break;
-        case 50:
-            console.log("OPEN HI-HAT");
-            playerState ="high";
-            break;
-        case 51:
-            console.log("RIDE");
-            playerState="high";
-            break;
-        case 47:
-          console.log("CLOSED HI-HAT");
-          playerState = "high";
-          break;
+    if (!currentNotes.includes(note)) {
+      currentNotes.push(note);
     }
-  } else{
-    playerState="idle";
+    console.log(currentNotes);
+
+  }else{
+    currentNotes = currentNotes.filter(n => n != note);
   }
+  if (currentNotes.includes(44) || currentNotes.includes(46)){
+    playerState="low";
+  }else if(currentNotes.includes(45)){
+    playerState = "medium";
+  }else if(currentNotes.length == 0){
+    playerState = "idle";
+  }else{
+    playerState = "high";
+  }
+  
 }
 
 function renderNotes(){
