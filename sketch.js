@@ -128,10 +128,7 @@ function menu() {
 }
 
 function drawEnemy(enemy){
-  if(width*0.1>=width*0.43-frameCount*npcMobSpeed){
-    npcMobSpeed=0;
-  }
-  image(slime, width-frameCount*npcMobSpeed, height*0.89,width*0.1,height*0.2);
+  image(slime, width*0.7, height*0.89,width*0.1,height*0.2);
 }
 
 function play() {
