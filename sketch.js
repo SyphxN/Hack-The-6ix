@@ -7,7 +7,10 @@ currentNotesPressed = [];
 playerScore = {0: 0, 50: 0, 100: 0, 300: 0}
 notesOnScreen = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
 hitNotes = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
-scoreFeedback = []
+scoreFeedback = [];
+score = 0;
+combo = 0;
+healthValue = 100;
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
@@ -89,6 +92,7 @@ function play() {
   image(bg, 0, 0, width, height);
   background(0,0,0,100)
   songFrame++;
+  healthValue -= healthDrain / fps;
 
   //show song frame counter
   push();
@@ -97,7 +101,21 @@ function play() {
   x = map(songFrame, 0, songLength + 120, 0, width);
 	line(0, height-10, x, height-10);
   pop();
-  // text("time: " + songFrame + " / " + songLength + 120, 10, 30);
+
+  // show health bar
+  push();
+  stroke(255, 0, 0);
+	strokeWeight(10);
+  x = map(healthValue, 0, 100, 0, width/3);
+	line(0, 5, x, 5);
+  pop();
+
+  // show combo
+  if (combo > 0) {
+    fill(255);
+    textSize(64);
+    text(combo + "x", 10, height-50);
+  }
   
   //drawing hit circles/projectiles based on frame number
   renderNotes();
@@ -106,6 +124,13 @@ function play() {
   // process input hit timing
   checkLateNotes();
   processHitTiming();
+
+  if (healthValue <= 0) {
+    gameState = "menu";
+    song.stop();
+  } else if (healthValue > 100) {
+    healthValue = 100;
+  }
 
   // draw hit score
   drawScore();
@@ -125,6 +150,8 @@ function checkLateNotes() {
       playerScore[0]++;
       // console.log("missed note");
       renderFeedback(0);
+      combo = 0;
+      healthValue -= 3 * healthDrain;
     }
   }
 }
@@ -133,13 +160,33 @@ function processHitTiming() {
   if (currentNotesPressed.length > 0 && notesOnScreen[currentNotesPressed[0]].length > 0) {
     while (currentNotesPressed.length > 0) {
       //console.log("currentNotesPressed[0]: ", currentNotesPressed[0]);
-      let score = calculateScore(songFrame, currentNotesPressed[0], notesOnScreen[currentNotesPressed[0]][0])
+      let noteScore = calculateScore(songFrame, currentNotesPressed[0], notesOnScreen[currentNotesPressed[0]][0])
       // console.log("score: ", score);
-      renderFeedback(score);
+      renderFeedback(noteScore);
+      switch (noteScore) {
+        case 0:
+          combo = 0;
+          healthValue -= 3 * healthDrain;
+          break;
+        case 50:
+          combo++;
+          healthValue -= 2 * healthDrain;
+          break;
+        case 100:
+          combo++;
+          healthValue += 1 * healthDrain;
+          break;
+        case 300:
+          combo++;
+          healthValue += 2 * healthDrain;
+          break;
+        default:
+          break;
+      }
       hitNotes[currentNotesPressed[0]].push(notesOnScreen[currentNotesPressed[0]][0]);
       notesOnScreen[currentNotesPressed[0]].shift();
       currentNotesPressed.shift();
-      playerScore[score]++;
+      playerScore[noteScore]++;
     }
   }
 }
