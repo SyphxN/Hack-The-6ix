@@ -30,6 +30,7 @@ mValues = [0, 1, 2, 3, 4, 5, 6, 7];
 hitSounds = [];
 
 function setup() {
+  console.log("setting up");
   createCanvas(windowWidth, windowHeight);
   loadSong();
   fps = 60;
@@ -61,7 +62,7 @@ function preload() {
         // Example: loadImage(`path/to/image_${id}.png`);
         resolve();
       }
-    }, 100);
+    }, 1000);
   });
 }
 
