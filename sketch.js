@@ -135,7 +135,7 @@ if (mouseX > width*0.02 && mouseX < width*0.02 + width*0.04 &&
   }
 
   drawPlayer(playerState, width*0.5, height*1.16,height*0.4); 
-  drawBoss(width*0.8,height*1.16,height*0.4); 
+  drawBoss("idle",width*0.8,height*1.16,height*0.4); 
   drawEnemy(0);
   config_length = max(kValues.length,mValues.length)
   if (config_length < 8){
@@ -209,7 +209,7 @@ function play() {
   text(score, 30, 50);
   
   //drawing hit circles/projectiles based on frame number
-  drawBoss(width*0.8,height*0.9,height*0.9);
+  drawBoss("attack",width*0.8,height*0.9,height*0.9);
   renderNotes();
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
   
@@ -351,14 +351,25 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
   }
 }
 
-function drawBoss(x=0, y=0, size=500){
-  if(frameCount%5==0){
+function drawBoss(state="attack",x=0, y=0, size=500){
+  if(frameCount%10==0){
     // console.log("Last state:",lastState," State:",state," Sprite:",animations[state][nextSprite]);
     image(heliImages[nextBossSprite], x-size*0.6, y-size*0.98, size*1.2,size);
     console.log(nextBossSprite);
     nextBossSprite++;
-    if(nextBossSprite/13 >1){
-      nextBossSprite=0;
+    resetPoint = (nextBossSprite/5)>1;
+    startSprite=0;
+    switch(state){
+      case "idle":
+        resetPoint=(nextBossSprite/5)>1; 
+        startSprite=1;
+        break;
+      case "attack":
+        resetPoint=(nextBossSprite/13)>1;
+        startSprite=7;
+    }
+    if(resetPoint){
+      nextBossSprite=startSprite;
     }
   }else{
     image(heliImages[nextBossSprite], x-size*0.6, y-size*0.98, size*1.2,size);
