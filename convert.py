@@ -19,6 +19,7 @@ def convert(filename):
     columnCount = 0
     approachRate = 0
     overallDifficulty = 0
+    healthDrain = 0
 
     with open(filename, 'r', encoding='utf-8') as file:
         for line in file:
@@ -38,6 +39,8 @@ def convert(filename):
                         approachRate = float(line.split(':')[1])
                     elif line.startswith('OverallDifficulty'):
                         overallDifficulty = float(line.split(':')[1])
+                    elif line.startswith('HPDrainRate'):
+                        healthDrain = float(line.split(':')[1])
                     sections[current_section].append(line)
                 else:
                     sections[current_section].append(line)
@@ -52,7 +55,7 @@ def convert(filename):
         frame = math.floor(float(line[2]) / frame_duration)
         rows[columnIndex].append(frame)
 
-    fileData = {'columnCount': columnCount, 'approachRate': approachRate, 'overallDifficulty': overallDifficulty, 'rows': rows}
+    fileData = {'columnCount': columnCount, 'approachRate': approachRate, 'overallDifficulty': overallDifficulty, 'healthDrain': healthDrain, 'rows': rows}
 
     with open(f'assets/song/{filename}.json', 'w') as file:
         file.write(json.dumps(fileData, indent=4))

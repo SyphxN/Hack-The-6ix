@@ -1,12 +1,13 @@
-gameState ="menu";
+gameState = "menu";
 playerState = "idle";
 lastState = "low";
 lastAttack = "high";
 nextSprite = 0;
-currentNotes = [];
-score = 0;
-playerTimings = {50: 0, 100: 0, 300: 0}
-hitNotes = []
+currentNotesPressed = [];
+playerScore = {0: 0, 50: 0, 100: 0, 300: 0}
+notesOnScreen = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
+hitNotes = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
+scoreFeedback = []
 
 config={
   0:{"k":0,"m":0},
@@ -34,8 +35,9 @@ function setup() {
   frameRate(fps);
   loadSong();
   score = 0;
-  playerTimings = {50: 0, 100: 0, 300: 0}
-  hitNotes = []
+  playerScore = {0: 0, 50: 0, 100: 0, 300: 0}
+  notesOnScreen = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
+  hitNotes = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
 }
 
 function preload() {
@@ -81,7 +83,7 @@ function play() {
   songFrame++;
 
   //show song frame counter
-  fill(0)
+  fill(0);
   textSize(32);
   text("time: " + songFrame, 10, 30);
   
@@ -91,16 +93,69 @@ function play() {
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
 
   // process input hit timing
-  
+  checkLateNotes();
+  processHitTiming();
+
+  // draw hit score
+  drawScore();
 
 }
 
+function checkLateNotes() {
+  for (let [i, frames] of Object.entries(notesOnScreen)) {
+    let frame_duration = 1000 / fps;
+    let badHitWindow = Math.ceil((200 - (overallDifficulty * 10)) / frame_duration);
+    let latestNote = notesOnScreen[i][0]
+    let hitTiming = songFrame - latestNote;
+    if (hitTiming > badHitWindow) {
+      notesOnScreen[i].shift()
+      hitNotes[i] = hitNotes[i].filter(n => n == latestNote);
+      playerScore[0]++;
+      // console.log("missed note");
+      renderFeedback(0);
+    }
+  }
+}
+
+function processHitTiming() {
+  if (currentNotesPressed.length > 0 && notesOnScreen[currentNotesPressed[0]].length > 0) {
+    while (currentNotesPressed.length > 0) {
+      let score = calculateScore(songFrame, currentNotesPressed[0], notesOnScreen[currentNotesPressed[0]][0])
+      // console.log("score: ", score);
+      renderFeedback(score);
+      hitNotes[currentNotesPressed[0]].push(notesOnScreen[currentNotesPressed[0]][0]);
+      notesOnScreen[currentNotesPressed[0]].shift();
+      currentNotesPressed.shift();
+      playerScore[score]++;
+      
+    }
+  }
+}
+
+function calculateScore(songFrame, notePressed, latestNote) {
+  let frame_duration = 1000 / fps;
+  let goodHitWindow = Math.ceil((80 - (overallDifficulty * 6)) / frame_duration);
+  let midHitWindow = Math.ceil((140 - (overallDifficulty * 8)) / frame_duration);
+  let badHitWindow = Math.ceil((200 - (overallDifficulty * 10)) / frame_duration);
+  let hitTiming = abs(latestNote - songFrame);
+  console.log("hitTiming: " + latestNote + " - " + songFrame + " = " + hitTiming + " <= (" + goodHitWindow + ", " + midHitWindow + ", " + badHitWindow + ")");
+  if (hitTiming <= goodHitWindow) {
+    return 300;
+  } else if (hitTiming <= midHitWindow) {
+    return 100;
+  } else if (hitTiming <= badHitWindow) {
+    return 50;
+  } else {
+    return 0;
+  }
+}
+
 function drawPlayer(state="idle", x=0, y=0, size=500) {
-  if (currentNotes.includes(6) || currentNotes.includes(7)){
+  if (currentNotesPressed.includes(6) || currentNotesPressed.includes(7)){
     playerState="low";
-  }else if(currentNotes.includes(3) || currentNotes.includes(4) || currentNotes.includes(5)){
+  }else if(currentNotesPressed.includes(3) || currentNotesPressed.includes(4) || currentNotesPressed.includes(5)){
     playerState = "medium";
-  }else if(currentNotes.length == 0){
+  }else if(currentNotesPressed.length == 0){
     playerState = "idle";
   }else{
     playerState = "high";
@@ -143,6 +198,7 @@ function loadSprites() {
   for (let i = 0; i < 11; i++) {
     images[i] = loadImage("assets/char/" + i + ".png");
   }
+  
 }
 
 function preloadSong() {
@@ -161,6 +217,8 @@ function loadSong(){ //secondary parse bc preloadSong() is async
   notes = jsonData.rows;
   approachRate = jsonData.approachRate;
   columnCount = jsonData.columnCount;
+  overallDifficulty = jsonData.overallDifficulty;
+  healthDrain = jsonData.healthDrain;
 }
 function midiAccessAllowed(midiAccess){
   //console.log(midiAccess);
@@ -176,7 +234,7 @@ function handleMidiInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   if(noteEvent == 144){
-    if (!currentNotes.includes(note)) {
+    if (!currentNotesPressed.includes(note)) {
       inputPressed(note);
     }
   } else  {
@@ -199,59 +257,117 @@ function keyReleased(){
 }
 
 function inputPressed(note){ // merges both kb and midi input
-  currentNotes.push(note);
-  console.log("pressed: "+ note);
-  console.log(currentNotes);
+  currentNotesPressed.push(note);
+  // console.log("pressed: "+ note);
+  // console.log(currentNotesPressed);
 }
 
 function inputReleased(note){ // merges both kb and midi input
-  currentNotes = currentNotes.filter(n => n != note);
-  console.log("released: "+ note);
-  console.log(currentNotes);
+  currentNotesPressed = currentNotesPressed.filter(n => n != note);
+  // console.log("released: "+ note);
+  // console.log(currentNotesPressed);
 }
 
 function renderNotes(){
   gameplayGUI();
   let hitCircleSize = 50;
-  let hitCircleSpeed = approachRate*3;
+  let hitCircleSpeed = approachRate*2;
 
   let frame_duration = 1000 / fps;
   let hitWindow = 0;
   
   for (let i = 0; i < columnCount; i++) {
     for (let testNote of notes[i]) {
-      if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
+      if (hitNotes[i].includes(testNote)) {
+        continue;
+      } else if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
         stroke(0)
         fill(189, 224, 254);
         ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
-      } else if (testNote-songFrame > -10 && testNote-songFrame <= 0) { //transparent fade out
+        if (!notesOnScreen[i].includes(testNote)) notesOnScreen[i].push(testNote);
+      } else if (testNote-songFrame > -10 && testNote-songFrame <= 0) { // transparent fade out
         alpha = map(testNote-songFrame, -10, 0, 0, 255);
         fill(189, 224, 254,alpha);
         stroke(0,alpha)
         ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
       }
-
-      // if (testNote-songFrame)
     }
   }
 
 }
 
+function renderFeedback(feedback) {
+  if (feedback == 0) {
+    scoreFeedback = ['0', 60];
+  } else if (feedback == 50) {
+    scoreFeedback = ['50', 60];
+  } else if (feedback == 100) {
+    scoreFeedback = ['100', 60];
+  } else if (feedback == 300) {
+    scoreFeedback = ['300', 60];
+  }
+}
+
+function drawScore() {
+  if (scoreFeedback[1] > 30) {
+    fill(0);
+    stroke(0);
+    text(scoreFeedback[0], width*0.5, height*0.5);
+    scoreFeedback[1]--;
+  } else if (scoreFeedback[1] > 0) {
+    console.log(scoreFeedback[1]*255 / 60);
+    fill(0, 0, 0, scoreFeedback[1]*255 / 60);
+    stroke(0, 0, 0, scoreFeedback[1]*255 / 60);
+    text(scoreFeedback[0], width*0.5, height*0.5);
+    scoreFeedback[1]--;
+  }
+}
+
 function gameplayGUI(){
-  line(width*0.35, height*0.1, width*0.35, height*0.9);
   let colors = [255,255,255,255,255,255,255,255];
   let rectHeight = height * 0.1;
   for (let i = 0; i < colors.length; i++) {
     fill(255,100);
     //rect(width*0.35, rectHeight * (i+1), width, rectHeight);
     fill(colors[i]);
-    if (currentNotes.includes(i)) {
+    if (currentNotesPressed.includes(i)) {
       fill(255,0,0);
     }
+    stroke(0);
     ellipse(width*0.35,height*0.1*i+height*0.15, 55, 55);
   }
 }
 
 function midiAccessDenied(){
   console.log("Could not connect to any midi device.")
+}
+
+function makeShadow(img, sigma, shadowColor, opacity) {
+  // Gaussian goes to approx. 0 at 3sigma
+  // away from the mean; pad image with
+  // 3sigma on all sides to give space
+  const newW = img.width + 6 * sigma;
+  const newH = img.height + 6 * sigma;
+  const g = createGraphics(newW, newH);
+  
+  g.imageMode(CENTER);
+  g.translate(newW/2, newH/2);
+  //g.tint(0, 0, 0, );
+  g.image(img, 0, 0);
+  g.filter(BLUR, sigma);
+  
+  const shadow = g.get();
+  const c = color(shadowColor);
+  shadow.loadPixels();
+  const numVals = 4 * shadow.width * shadow.height;
+  for (let i = 0; i < numVals; i+=4) {
+    shadow.pixels[i + 0] = c.levels[0];
+    shadow.pixels[i + 1] = c.levels[1];
+    shadow.pixels[i + 2] = c.levels[2];
+    shadow.pixels[i + 3] *= opacity;
+  }
+  shadow.updatePixels();
+  
+  g.remove();
+  return shadow;
 }

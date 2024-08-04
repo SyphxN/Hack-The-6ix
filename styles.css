@@ -1,0 +1,52 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('home.png');
+    background-size: cover; /* Cover the entire viewport */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent the background image from repeating */
+}
+
+.carousel-container {
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+
+}
+
+.carousel {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.carousel-item {
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 20px;
+    background: rgba(240,240,240,0.5);
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;    
+}
+
+.prev {
+    bottom: -300px;
+}
+
+.next {
+    bottom: -300px;
+}
