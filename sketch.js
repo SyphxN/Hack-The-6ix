@@ -11,6 +11,14 @@ scoreFeedback = [];
 score = 0;
 combo = 0;
 healthValue = 100;
+let id,levelID;
+
+function initSketch(id) {
+  console.log("Received ID:", id);
+  levelID = id;
+}
+
+window.initSketch = initSketch;
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
@@ -22,23 +30,39 @@ mValues = [0, 1, 2, 3, 4, 5, 6, 7];
 hitSounds = [];
 
 function setup() {
-  // fullscreen canvas
   createCanvas(windowWidth, windowHeight);
+  loadSong();
   fps = 60;
   frameRate(fps);
-  loadSong();
-  score = 0;
+  resetValues();
+  console.log("Setup complete with ID:", levelID);
+}
+
+function resetValues() {
+  currentNotesPressed = [];
   playerScore = {0: 0, 50: 0, 100: 0, 300: 0}
   notesOnScreen = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
   hitNotes = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
+  scoreFeedback = [];
+  score = 0;
+  combo = 0;
+  healthValue = 100;
 }
 
 function preload() {
   menuBg = loadImage("assets\\menuBg.png");
-  songBg = loadImage("assets\\song\\bg.jpg");
-  fg = loadImage("assets\\fg.png")
   loadSprites();
-  preloadSong();
+  return new Promise((resolve) => {
+    const checkId = setInterval(() => {
+      if (levelID !== undefined) {
+        clearInterval(checkId);
+        console.log("Preloading assets for ID:", levelID);
+        preloadSong();
+        // Example: loadImage(`path/to/image_${id}.png`);
+        resolve();
+      }
+    }, 100);
+  });
 }
 
 function draw() {
@@ -63,6 +87,7 @@ function menu() {
   image(menuBg,(width*0.5+offset*2),height*0.51,width,height*1.02);
   image(menuBg,(width*1.5+offset*2),height*0.51,width,height*1.02);
   textSize(32);
+  fill(255);
   text("p to play", 10, 30);
   text("c for config", 10, 60);
   //p
@@ -70,6 +95,7 @@ function menu() {
     if (gamestate = "menu"){
       songFrame = 0;
     }
+    resetValues();
     gameState = "play";
   }
   if (keyIsDown(67)){
@@ -98,9 +124,7 @@ function play() {
   }
   imageMode(CENTER)
   background(200);
-  offset=(-frameCount*2)%(width/2)
-  image(songBg,(width*0.5+offset),height*0.33,width*1.2,height*1.2);
-  image(songBg,(width*1.7+offset),height*0.33,width*1.2,height*1.2);
+  image(bg,width*0.5,height*0.5,width,height);
   
   imageMode(CORNER)
   background(0,0,0,100)
@@ -108,15 +132,10 @@ function play() {
   healthValue -= healthDrain / fps;
 
   //show song frame counter
-  fill(0);
-  textSize(32);
-  text("time: " + songFrame, 10, 30);
+  // fill(0);
+  // textSize(32);
+  // text("time: " + songFrame, 10, 30);
   
-  //draw fg elements
-  imageMode(CENTER)
-  image(fg,(width*0.5+offset*2),height*0.5,width,height);
-  image(fg,(width*2.5+offset*2),height*0.5,width,height);
-  imageMode(CORNER)
   //drawing hit circles/prjectiles based on frame number
   push();
   stroke(255, 0, 0);
@@ -139,6 +158,12 @@ function play() {
     textSize(64);
     text(combo + "x", 10, height-50);
   }
+
+  // show score
+  fill(255);
+  textSize(34);
+  noStroke();
+  text(score, 30, 50);
   
   //drawing hit circles/projectiles based on frame number
   renderNotes();
@@ -174,7 +199,7 @@ function checkLateNotes() {
       // console.log("missed note");
       renderFeedback(0);
       combo = 0;
-      healthValue -= 3 * healthDrain;
+      healthValue -= 0.5 * healthDrain;
     }
   }
 }
@@ -187,21 +212,24 @@ function processHitTiming() {
       // console.log("score: ", score);
       renderFeedback(noteScore);
       switch (noteScore) {
-        case 0:
+        case 0: 
           combo = 0;
-          healthValue -= 3 * healthDrain;
+          healthValue -= 0.5 * healthDrain;
           break;
         case 50:
           combo++;
-          healthValue -= 2 * healthDrain;
+          healthValue -= 0.25 * healthDrain;
+          score += (50 * combo);
           break;
         case 100:
           combo++;
-          healthValue += 1 * healthDrain;
+          healthValue += 2 * healthDrain;
+          score += (100 * combo);
           break;
         case 300:
           combo++;
-          healthValue += 2 * healthDrain;
+          healthValue += 5 * healthDrain;
+          score += (300 * combo);
           break;
         default:
           break;
@@ -288,10 +316,10 @@ function loadSprites() {
 }
 
 function preloadSong() {
-  song = loadSound("assets/song/audio.mp3");
+  song = loadSound("assets/song/"+levelID+".mp3");
   // preloadNotes = loadStrings("assets/song/notes.txt")
-  jsonData = loadJSON("assets/song/map.json");
-  bg = loadImage("assets/song/bg.jpg");
+  jsonData = loadJSON("assets/song/"+levelID+".json");
+  bg = loadImage("assets/song/"+levelID+".jpg");
   kick = loadSound("assets/drum_sounds/0.wav");
   snare = loadSound("assets/drum_sounds/1.wav");
   floorTom = loadSound("assets/drum_sounds/2.wav");

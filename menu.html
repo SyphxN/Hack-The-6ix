@@ -38,15 +38,18 @@
         <div class="column is-4 modal-button" data-target="modal-image">
             <div class="card is-shady">
               <div class="card-image">
-                <figure class="image is-4by3">
-                  <img src="https://i1.sndcdn.com/artworks-000068377041-7ak236-t500x500.jpg" alt="Placeholder image">
+                <figure class="image is-16by9">
+                    <img src="https://i.ppy.sh/6fb20c10e59593a711be2e9f551a3ab513ec52ba/68747470733a2f2f692e6962622e636f2f6753476d4b71502f5061646f72752e6a7067" alt="Placeholder image" style="width: 100%; height: auto; object-fit: contain;">
                 </figure>
               </div>
               <div class="card-content">
                 <div class="content">
-                  <h4>1</h4>
-                  <p class="text">Artist: xi</p>
-                  <span class="button is-link modal-button" data-target="modal-image">Image modal</span>
+                  <h4>PADORU / PADORU</h4>
+                    <p>Artist: Turbo</p>
+                    <div class="play-difficulty">
+                        <span class="button is-link modal-button" data-target="modal-image" data-id="1">Play!</span>
+                        <p class="tag is-size-5 has-text-weight-semibold is-primary difficulty-text">Difficulty: 1.17⭐</p>
+                      </div>
                 </div>
               </div>
             </div>
@@ -54,7 +57,7 @@
           <div class="column is-4 modal-button" data-target="modal-image">
           <div class="card is-shady">
             <div class="card-image">
-              <figure class="image is-4by3">
+              <figure class="image is-16by9">
                 <img src="https://i1.sndcdn.com/artworks-000068377041-7ak236-t500x500.jpg" alt="Placeholder image">
               </figure>
             </div>
@@ -62,7 +65,7 @@
               <div class="content">
                 <h4>2</h4>
                 <p class="text">Artist: xi</p>
-                <span class="button is-link modal-button" data-target="modal-image">Image modal</span>
+                <span class="button is-link modal-button" data-target="modal-image"data-id="2">Play!</span>
               </div>
             </div>
           </div>
@@ -70,7 +73,7 @@
         <div class="column is-4 modal-button" data-target="modal-image">
           <div class="card is-shady">
             <div class="card-image">
-              <figure class="image is-4by3">
+              <figure class="image is-16by9">
                 <img src="https://i1.sndcdn.com/artworks-000068377041-7ak236-t500x500.jpg" alt="Placeholder image">
               </figure>
             </div>
@@ -78,7 +81,7 @@
               <div class="content">
                 <h4>3</h4>
                 <p class="text">Artist: xi</p>
-                <span class="button is-link modal-button" data-target="modal-image">Image modal</span>
+                <span class="button is-link modal-button" data-target="modal-image"data-id="3">Play!</span>
               </div>
             </div>
           </div>
@@ -88,7 +91,7 @@
         <div class="column is-4 modal-button" data-target="modal-image">
             <div class="card is-shady">
               <div class="card-image">
-                <figure class="image is-4by3">
+                <figure class="image is-16by9">
                   <img src="https://i1.sndcdn.com/artworks-000068377041-7ak236-t500x500.jpg" alt="Placeholder image">
                 </figure>
               </div>
@@ -96,7 +99,7 @@
                 <div class="content">
                   <h4>4</h4>
                   <p class="text">Artist: xi</p>
-                  <span class="button is-link modal-button" data-target="modal-image">Image modal</span>
+                  <span class="button is-link modal-button" data-target="modal-image"data-id="4">Play!</span>
                 </div>
               </div>
             </div>
@@ -104,7 +107,7 @@
           <div class="column is-4 modal-button" data-target="modal-image">
             <div class="card is-shady">
               <div class="card-image">
-                <figure class="image is-4by3">
+                <figure class="image is-16by9">
                   <img src="https://i1.sndcdn.com/artworks-000068377041-7ak236-t500x500.jpg" alt="Placeholder image">
                 </figure>
               </div>
@@ -112,7 +115,7 @@
                 <div class="content">
                   <h4>5</h4>
                   <p class="text">Artist: xi</p>
-                  <span class="button is-link modal-button" data-target="modal-image">Image modal</span>
+                  <span class="button is-link modal-button" data-target="modal-image"data-id="5">Play!</span>
                 </div>
               </div>
             </div>
@@ -131,11 +134,45 @@
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
       </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          // Function to handle opening the modal with the correct ID
+          const openModal = (event) => {
+            event.stopPropagation(); // Prevent the event from bubbling up
+            const button = event.currentTarget;
+            const id = button.getAttribute('data-id');
+            const modal = document.querySelector('#modal-image');
+            const iframe = modal.querySelector('iframe');
+            iframe.src = `index.html?id=${id}`;
+            console.log(iframe.src);
+            modal.classList.add('is-active');
+          };
+      
+          // Attach event listeners to modal buttons
+          document.querySelectorAll('.modal-button').forEach(button => {
+            button.addEventListener('click', openModal);
+          });
+      
+          // Function to handle closing the modal
+          const closeModal = (event) => {
+            const modal = event.currentTarget.closest('.modal');
+            modal.classList.remove('is-active');
+            modal.querySelector('iframe').src = ''; // Clear the src to stop the video
+          };
+      
+          // Attach event listeners to modal close buttons
+          document.querySelectorAll('.modal-close').forEach(button => {
+            button.addEventListener('click', closeModal);
+          });
+        });
+      </script>
+      
       
     <script src="https://unpkg.com/bulma-modal-fx/dist/js/modal-fx.min.js"></script>
 <script
   src="https://code.jquery.com/jquery-3.7.0.slim.min.js"
   integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE="
   crossorigin="anonymous"></script>    <script src="../js/wild.js"></script>
+  
   </body>
 </html>

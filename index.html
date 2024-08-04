@@ -15,6 +15,21 @@
     </style>
 </head>
 <body>
+    <script>
+        function getQueryParam(param) {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get(param);
+        }
+      
+        window.onload = () => {
+          const id = getQueryParam('id');
+          if (id) {
+            // Assuming sketch.js is included and has a function to handle the id
+            window.initSketch(id);
+          }
+        }
+      </script>
+      
     <script src="sketch.js"></script>
 </body>
 </html>
