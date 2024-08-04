@@ -12,6 +12,7 @@ score = 0;
 combo = 0;
 healthValue = 100;
 let id,levelID;
+npcMobSpeed=0.5;
 
 function initSketch(id) {
   console.log("Received ID:", id);
@@ -106,6 +107,7 @@ function menu() {
 
   drawPlayer(playerState, width*0.5, height*1.16,height*0.4);
   drawEnemy(0);
+  console.log("enemy was drawn")
   config_length = max(kValues.length,mValues.length)
   if (config_length < 8){
     text("Select a keybind for the note " + int(config_length+1), 10, 90);
@@ -116,9 +118,10 @@ function menu() {
 }
 
 function drawEnemy(enemy){
-  walk = enemyImages[enemy].splice(23,28);
-  
-  image(walk[frameCount], x-size*0.6, y-size*0.98, size*1.2,size);
+  if(width*0.1>=width*0.43-frameCount*npcMobSpeed){
+    npcMobSpeed=0;
+  }
+  image(slime, width-frameCount*npcMobSpeed, height*0.89,width*0.1,height*0.2);
 }
 
 function play() {
@@ -319,10 +322,7 @@ function loadSprites() {
     images[i] = loadImage("assets/char/" + i + ".png");
   }
   //for (let i = 0; i < 5; i++) {
-  enemyImages=[[],[],[],[],[],[]]
-  for (let j=0; j<29;j++){
-    enemyImages[0][j] = loadImage("assets/enemies/" + "0" + "/"+j+".png");
-  }
+  slime = loadImage("assets\\Walk.gif");
   //}
   miss = loadImage("assets/hit/0.png");
   ok = loadImage("assets/hit/50.png");
