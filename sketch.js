@@ -9,23 +9,12 @@ notesOnScreen = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
 hitNotes = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
 scoreFeedback = []
 
-config={
-  0:{"k":0,"m":0},
-  1:{"k":1,"m":1},
-  2:{"k":2,"m":2},
-  3:{"k":3,"m":3},
-  4:{"k":4,"m":4},
-  5:{"k":5,"m":5},
-  6:{"k":6,"m":6},
-  7:{"k":7,"m":7},
-}
-
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
 }
 
 // Define the arrays for k and m values
-kValues = [48,49,50,51,52,53,54,55];
+kValues = [49,50,51,52,53,54,55,56];
 mValues = [0, 1, 2, 3, 4, 5, 6, 7];
 hitSounds = [];
 
@@ -259,7 +248,7 @@ function handleMidiInput(input){
       mValues.push(note);
       console.log(mValues);
     }
-    if (!currentNotes.includes(note)) {
+    if (!currentNotesPressed.includes(note)) {
       inputPressed(mValues.indexOf(note));
     }
   } else  {
@@ -287,16 +276,16 @@ function keyReleased(){
 
 
 function inputPressed(note){ // merges both kb and midi input
-  currentNotes.push(note);
+  currentNotesPressed.push(note);
   // console.log("pressed: "+ note);
   hitSounds[note].play();
 }
 
 function inputReleased(note){ // merges both kb and midi input
-  currentNotes = currentNotes.filter(n => n != note);
+  currentNotesPressed = currentNotesPressed.filter(n => n != note);
   // console.log("released: "+ note);
   hitSounds[note].play;
-  console.log(currentNotes);
+  console.log(currentNotesPressed);
 }
 
 function renderNotes(){
