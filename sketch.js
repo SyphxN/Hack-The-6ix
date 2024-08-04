@@ -66,11 +66,15 @@ function menu() {
   if (keyIsDown(67)){
     gameState="config";
   }
-
   drawPlayer(playerState, mouseX, mouseY);
 }
 
 function play() {
+  if (songFrame > songLength + 120) {
+    gameState = "menu";
+    song.stop();
+  }
+
   //plays for first time
   if (!song.isPlaying()) {
     song.play();
@@ -80,11 +84,14 @@ function play() {
   songFrame++;
 
   //show song frame counter
-  fill(0);
-  textSize(32);
-  text("time: " + songFrame, 10, 30);
+  push();
+  stroke(255, 0, 0);
+	strokeWeight(10);
+  x = map(songFrame, 0, songLength + 120, 0, width);
+	line(0, height-10, x, height-10);
+  pop();
+  // text("time: " + songFrame + " / " + songLength + 120, 10, 30);
   
-
   //drawing hit circles/projectiles based on frame number
   renderNotes();
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
@@ -97,6 +104,7 @@ function play() {
   drawScore();
 
 }
+
 
 function checkLateNotes() {
   for (let [i, frames] of Object.entries(notesOnScreen)) {
@@ -125,7 +133,6 @@ function processHitTiming() {
       notesOnScreen[currentNotesPressed[0]].shift();
       currentNotesPressed.shift();
       playerScore[score]++;
-      
     }
   }
 }
@@ -226,6 +233,7 @@ function loadSong(){ //secondary parse bc preloadSong() is async
   //   notes.push(note);
   // }
   notes = jsonData.rows;
+  songLength = jsonData.songLength;
   approachRate = jsonData.approachRate;
   columnCount = jsonData.columnCount;
   overallDifficulty = jsonData.overallDifficulty;
@@ -247,6 +255,8 @@ function handleMidiInput(input){
   if(noteEvent == 144){
     if (mValues.length<8 && !mValues.includes(note)){
       mValues.push(note);
+      console.log("meow");
+      text("meow", 10, 30);
       console.log(mValues);
     }
     if (!currentNotesPressed.includes(note)) {
@@ -299,7 +309,6 @@ function renderNotes(){
 
   let frame_duration = 1000 / fps;
   let hitWindow = 0;
-  
   for (let i = 0; i < columnCount; i++) {
     for (let testNote of notes[i]) {
       if (hitNotes[i].includes(testNote)) {
