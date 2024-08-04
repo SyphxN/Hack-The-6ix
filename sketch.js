@@ -209,7 +209,7 @@ function play() {
   text(score, 30, 50);
   
   //drawing hit circles/projectiles based on frame number
-  drawBoss("attack",width*0.8,height*0.9,height*0.9);
+  drawBoss("attack",width*0.75,height*0.9,height*0.9);
   renderNotes();
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
   
