@@ -1,7 +1,9 @@
 {
+    "songLength": 1899,
     "columnCount": 4,
     "approachRate": 5.0,
     "overallDifficulty": 8.0,
+    "healthDrain": 8.0,
     "rows": [
         [
             79,

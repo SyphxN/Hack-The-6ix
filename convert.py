@@ -16,10 +16,12 @@ FPS = 60
 def convert(filename):
     sections = {}
     current_section = None
+    songLength = 0
     columnCount = 0
     approachRate = 0
     overallDifficulty = 0
     healthDrain = 0
+    frame_duration = 1000 / FPS
 
     with open(filename, 'r', encoding='utf-8') as file:
         for line in file:
@@ -32,6 +34,7 @@ def convert(filename):
             elif current_section:
                 if current_section == 'HitObjects':
                     sections[current_section].append(line.split(','))
+                    songLength = math.ceil(float(line.split(',')[2]) / frame_duration)
                 elif current_section == 'Difficulty':
                     if line.startswith('CircleSize'):
                         columnCount = int(line.split(':')[1])
@@ -45,7 +48,6 @@ def convert(filename):
                 else:
                     sections[current_section].append(line)
 
-    frame_duration = 1000 / FPS
     rows = [[] for _ in range(columnCount) ]
     for line in sections['HitObjects']:
         # 0:x, 1:y, 2:time, 3:type, 4:hitsound, 5:extras
@@ -55,7 +57,7 @@ def convert(filename):
         frame = math.floor(float(line[2]) / frame_duration)
         rows[columnIndex].append(frame)
 
-    fileData = {'columnCount': columnCount, 'approachRate': approachRate, 'overallDifficulty': overallDifficulty, 'healthDrain': healthDrain, 'rows': rows}
+    fileData = {'songLength': songLength, 'columnCount': columnCount, 'approachRate': approachRate, 'overallDifficulty': overallDifficulty, 'healthDrain': healthDrain, 'rows': rows}
 
     with open(f'assets/song/{filename}.json', 'w') as file:
         file.write(json.dumps(fileData, indent=4))

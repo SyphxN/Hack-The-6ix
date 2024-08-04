@@ -34,7 +34,7 @@ html,body {
 .card-content .content {
   font-size: 14px;
   margin: 1rem 1rem;
-    height: 200px; /* Adjust to your desired height */
+    height: 100px; /* Adjust to your desired height */
     width: 300px;  /* Adjust to your desired width */
 }
 .card-content .content h4 {
