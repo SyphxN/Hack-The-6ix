@@ -158,6 +158,7 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
   }else{
     playerState = "high";
   }
+  console.log(currentNotesPressed);
   //draws player from bottom right foot
   var animations = {
     "idle":[0,1,2],
@@ -276,7 +277,9 @@ function keyReleased(){
 
 
 function inputPressed(note){ // merges both kb and midi input
-  currentNotesPressed.push(note);
+  if(note>=0){
+    currentNotesPressed.push(note);
+  }
   // console.log("pressed: "+ note);
   if(note>=0){
     hitSounds[note].play();
@@ -287,8 +290,6 @@ function inputPressed(note){ // merges both kb and midi input
 function inputReleased(note){ // merges both kb and midi input
   currentNotesPressed = currentNotesPressed.filter(n => n != note);
   // console.log("released: "+ note);
-  hitSounds[note].play;
-
 }
 
 function renderNotes(){
