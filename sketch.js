@@ -421,12 +421,12 @@ function drawScore() {
   if (scoreFeedback[1] > 30) {
     fill(0);
     stroke(0);
-    image(scoreFeedback[0], width*0.5, height*0.5,250,100);
+    image(scoreFeedback[0], width*0.85, height*0.85,250,100);
     scoreFeedback[1]--;
   } else if (scoreFeedback[1] > 0) {
     fill(0, 0, 0, scoreFeedback[1]*255 / 60);
     stroke(0, 0, 0, scoreFeedback[1]*255 / 60);
-    image(scoreFeedback[0], width*0.5, height*0.5,250,100);
+    image(scoreFeedback[0], width*0.85, height*0.85,250,100);
     scoreFeedback[1]--;
   }
   imageMode(CORNER)
