@@ -117,7 +117,7 @@ function checkLateNotes() {
 function processHitTiming() {
   if (currentNotesPressed.length > 0 && notesOnScreen[currentNotesPressed[0]].length > 0) {
     while (currentNotesPressed.length > 0) {
-      console.log("currentNotesPressed[0]: ", currentNotesPressed[0]);
+      //console.log("currentNotesPressed[0]: ", currentNotesPressed[0]);
       let score = calculateScore(songFrame, currentNotesPressed[0], notesOnScreen[currentNotesPressed[0]][0])
       // console.log("score: ", score);
       renderFeedback(score);
@@ -136,7 +136,7 @@ function calculateScore(songFrame, notePressed, latestNote) {
   let midHitWindow = Math.ceil((140 - (overallDifficulty * 8)) / frame_duration);
   let badHitWindow = Math.ceil((200 - (overallDifficulty * 10)) / frame_duration);
   let hitTiming = abs(latestNote - songFrame);
-  console.log("hitTiming: " + latestNote + " - " + songFrame + " = " + hitTiming + " <= (" + goodHitWindow + ", " + midHitWindow + ", " + badHitWindow + ")");
+  //console.log("hitTiming: " + latestNote + " - " + songFrame + " = " + hitTiming + " <= (" + goodHitWindow + ", " + midHitWindow + ", " + badHitWindow + ")");
   if (hitTiming <= goodHitWindow) {
     return 300;
   } else if (hitTiming <= midHitWindow) {
@@ -158,7 +158,7 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
   }else{
     playerState = "high";
   }
-  console.log(currentNotesPressed);
+  //console.log(currentNotesPressed);
   //draws player from bottom right foot
   var animations = {
     "idle":[0,1,2],
