@@ -6,16 +6,16 @@ nextSprite = 0;
 currentNotes = [];
 score = 0;
 playerTimings = {50: 0, 100: 0, 300: 0}
-hitNotes = []
+hitNotes = [];
 
 if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
 }
 
 // Define the arrays for k and m values
-const kValues = [0, 1, 2, 3, 4, 5, 6, 7];
-const mValues = [0, 1, 2, 3, 4, 5, 6, 7];
-
+kValues = [48,49,50,51,52,53,54,55];
+mValues = [0, 1, 2, 3, 4, 5, 6, 7];
+hitSounds = [];
 
 function setup() {
   // fullscreen canvas
@@ -151,6 +151,15 @@ function preloadSong() {
   // preloadNotes = loadStrings("assets/song/notes.txt")
   jsonData = loadJSON("assets/song/map.json");
   bg = loadImage("assets/song/bg.jpg");
+  kick = loadSound("assets/drum_sounds/0.wav");
+  snare = loadSound("assets/drum_sounds/1.wav");
+  floorTom = loadSound("assets/drum_sounds/2.wav");
+  hi_hat = loadSound("assets/drum_sounds/3.wav");
+  crash = loadSound("assets/drum_sounds/4.wav");
+  high_tom = loadSound("assets/drum_sounds/5.wav");
+  open_hi_hat = loadSound("assets/drum_sounds/6.wav");
+  ride = loadSound("assets/drum_sounds/7.wav");
+  hitSounds = [kick,snare,floorTom,hi_hat,crash,high_tom,open_hi_hat,ride];
 }
 
 function loadSong(){ //secondary parse bc preloadSong() is async
@@ -177,7 +186,7 @@ function handleMidiInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   if(noteEvent == 144){
-    if (mValues.length<8){
+    if (mValues.length<8 && !mValues.includes(note)){
       mValues.push(note);
       console.log(mValues);
     }
@@ -191,7 +200,7 @@ function handleMidiInput(input){
 
 function keyPressed(){
   //if key from 1-8
-  if (kValues.length<8){
+  if (kValues.length<8 && !kValues.includes(keyCode)){
     kValues.push(keyCode);
     console.log(kValues);
   }
@@ -212,11 +221,13 @@ function inputPressed(note){ // merges both kb and midi input
   currentNotes.push(note);
   console.log("pressed: "+ note);
   console.log(currentNotes);
+  hitSounds[note].play();
 }
 
 function inputReleased(note){ // merges both kb and midi input
   currentNotes = currentNotes.filter(n => n != note);
   console.log("released: "+ note);
+  hitSounds[note].play;
   console.log(currentNotes);
 }
 
