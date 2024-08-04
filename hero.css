@@ -4,7 +4,7 @@
 }
 
 html,body {
-  background: #EFF3F4;
+  background: #fdfcdc;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 .hero-body .container {
@@ -64,7 +64,7 @@ html,body {
 }
 .is-shady {
 animation: flyintoright .4s backwards;
-background: #fff;
+background: #fed9b7;
 box-shadow: rgba(0, 0, 0, .1) 0 1px 0;
 border-radius: 4px;
 display: inline-block;
