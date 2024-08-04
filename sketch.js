@@ -31,6 +31,9 @@ function setup() {
 }
 
 function preload() {
+  menuBg = loadImage("assets\\menuBg.png");
+  songBg = loadImage("assets\\song\\bg.jpg");
+  fg = loadImage("assets\\fg.png")
   loadSprites();
   preloadSong();
 }
@@ -50,9 +53,12 @@ function draw() {
       break;
   }
 }
-
 function menu() {
-  background(120);
+  imageMode(CENTER)
+  background(200);
+  offset=(-frameCount)%width
+  image(menuBg,(width*0.5+offset*2),height*0.51,width,height*1.02);
+  image(menuBg,(width*1.5+offset*2),height*0.51,width,height*1.02);
   textSize(32);
   text("p to play", 10, 30);
   text("c for config", 10, 60);
@@ -67,7 +73,7 @@ function menu() {
     gameState="config";
   }
 
-  drawPlayer(playerState, mouseX, mouseY);
+  drawPlayer(playerState, width*0.5, height*1.16,height*0.4);
 }
 
 function play() {
@@ -75,7 +81,13 @@ function play() {
   if (!song.isPlaying()) {
     song.play();
   }
-  image(bg, 0, 0, width, height);
+  imageMode(CENTER)
+  background(200);
+  offset=(-frameCount*2)%width
+  image(songBg,(width*0.5+offset),height*0.33,width*1.2,height*1.2);
+  image(songBg,(width*1.7+offset),height*0.33,width*1.2,height*1.2);
+  
+  imageMode(CORNER)
   background(0,0,0,100)
   songFrame++;
 
@@ -84,8 +96,12 @@ function play() {
   textSize(32);
   text("time: " + songFrame, 10, 30);
   
-
-  //drawing hit circles/projectiles based on frame number
+  //draw fg elements
+  imageMode(CENTER)
+  image(fg,(width*0.5+offset*2),height*0.5,width,height);
+  image(fg,(width*2.5+offset*2),height*0.5,width,height);
+  imageMode(CORNER)
+  //drawing hit circles/prjectiles based on frame number
   renderNotes();
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
 
