@@ -30,6 +30,7 @@ mValues = [0, 1, 2, 3, 4, 5, 6, 7];
 hitSounds = [];
 
 function setup() {
+  console.log("setting up");
   createCanvas(windowWidth, windowHeight);
   fps = 60;
   frameRate(fps);
@@ -62,7 +63,7 @@ function preload() {
           .then(() => resolve())
           .catch(error => reject(error));
       }
-    }, 100);
+    }, 1000);
   });
 }
 
