@@ -31,7 +31,6 @@ hitSounds = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  loadSong();
   fps = 60;
   frameRate(fps);
   resetValues();
@@ -48,25 +47,20 @@ function resetValues() {
   combo = 0;
   healthValue = 100;
 }
-
 function preload() {
-  menuBg = loadImage("assets\\menuBg.png");
+  menuBg = loadImage("assets/menuBg.png");
   loadSprites();
-  return new Promise((resolve) => {
+
+  // Return a promise that resolves when loadAssets() completes
+  return new Promise((resolve, reject) => {
     const checkId = setInterval(() => {
       if (levelID !== undefined) {
         clearInterval(checkId);
         console.log("Preloading assets for ID:", levelID);
-        preloadSong(levelID)
-        .then(() => {
-          console.log('All assets and JSON data loaded successfully.');
-          // Proceed with initialization or other logic
-        })
-        .catch(error => {
-          console.error('Error loading assets or JSON data:', error);
-        });
-        // Example: loadImage(`path/to/image_${id}.png`);
-        resolve();
+
+        loadAssets()
+          .then(() => resolve())
+          .catch(error => reject(error));
       }
     }, 100);
   });
@@ -322,57 +316,43 @@ function loadSprites() {
   amazing = loadImage("assets/hit/300.png");
 }
 
-function preloadSong(levelID) {
-  // Load sound files and image synchronously
-  const song = loadSound(`assets/song/${levelID}.mp3`);
-  const bg = loadImage(`assets/song/${levelID}.jpg`);
-  const kick = loadSound("assets/drum_sounds/0.wav");
-  const snare = loadSound("assets/drum_sounds/1.wav");
-  const floorTom = loadSound("assets/drum_sounds/2.wav");
-  const hi_hat = loadSound("assets/drum_sounds/3.wav");
-  const crash = loadSound("assets/drum_sounds/4.wav");
-  const high_tom = loadSound("assets/drum_sounds/5.wav");
-  const open_hi_hat = loadSound("assets/drum_sounds/6.wav");
-  const ride = loadSound("assets/drum_sounds/7.wav");
+function loadAssets() {
+  return new Promise((resolve, reject) => {
+    // Load the JSON data first
+    loadJSON(`assets/song/${levelID}.json`, (data) => {
+      jsonData = data;
 
-  // Return a promise that resolves when JSON data is fully loaded
-  const jsonPromise = fetch(`assets/song/${levelID}.json`)
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
+      // Load other assets
+      song = loadSound(`assets/song/${levelID}.mp3`);
+      bg = loadImage(`assets/song/${levelID}.jpg`);
+      kick = loadSound("assets/drum_sounds/0.wav");
+      snare = loadSound("assets/drum_sounds/1.wav");
+      floorTom = loadSound("assets/drum_sounds/2.wav");
+      hi_hat = loadSound("assets/drum_sounds/3.wav");
+      crash = loadSound("assets/drum_sounds/4.wav");
+      high_tom = loadSound("assets/drum_sounds/5.wav");
+      open_hi_hat = loadSound("assets/drum_sounds/6.wav");
+      ride = loadSound("assets/drum_sounds/7.wav");
+      hitSounds = [kick, snare, floorTom, hi_hat, crash, high_tom, open_hi_hat, ride];
+
+      // Load additional assets or perform setup based on JSON data
+      notes = jsonData.rows;
+      songLength = jsonData.songLength;
+      approachRate = jsonData.approachRate;
+      columnCount = jsonData.columnCount;
+      overallDifficulty = jsonData.overallDifficulty;
+      healthDrain = jsonData.healthDrain;
+
+      // Resolve the promise when all assets are loaded and initialized
+      resolve();
+    }, (error) => {
+      console.error("Error loading JSON:", error);
+      reject(error);
     });
-
-  return jsonPromise.then(jsonData => {
-    // All assets are loaded and JSON data is available
-    window.song = song;
-    window.bg = bg;
-    window.kick = kick;
-    window.snare = snare;
-    window.floorTom = floorTom;
-    window.hi_hat = hi_hat;
-    window.crash = crash;
-    window.high_tom = high_tom;
-    window.open_hi_hat = open_hi_hat;
-    window.ride = ride;
-    window.jsonData = jsonData;
-    window.hitSounds = [kick, snare, floorTom, hi_hat, crash, high_tom, open_hi_hat, ride];
   });
 }
 
 
-function loadSong(){ //secondary parse bc preloadSong() is async
-  // notes = [];
-  // for (let line of preloadNotes) {
-  //   let note = int(line.split(","));
-  //   notes.push(note);
-  // }
-  notes = jsonData.rows;
-  songLength = jsonData.songLength;
-  approachRate = jsonData.approachRate;
-  columnCount = jsonData.columnCount;
-  overallDifficulty = jsonData.overallDifficulty;
-  healthDrain = jsonData.healthDrain;
-}
 function midiAccessAllowed(midiAccess){
   //console.log(midiAccess);
   const inputs = midiAccess.inputs;
