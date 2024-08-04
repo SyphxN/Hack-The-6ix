@@ -3,6 +3,7 @@ playerState = "idle";
 lastState = "low";
 lastAttack = "high";
 nextSprite = 0;
+nextBossSprite=0;
 currentNotesPressed = [];
 playerScore = {0: 0, 50: 0, 100: 0, 300: 0}
 notesOnScreen = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
@@ -52,6 +53,8 @@ function resetValues() {
 function preload() {
   menuBg = loadImage("assets/menuBg.png");
   logo = loadImage("assets/logo/mainlogo.png");
+  playButton = loadImage("assets/UI/play.png");
+  settingsButton = loadImage("assets/UI/settings.png");
   loadSprites();
 
   // Return a promise that resolves when loadAssets() completes
@@ -91,10 +94,34 @@ function menu() {
   image(menuBg,(width*0.5+offset*2),height*0.51,width,height*1.02);
   image(menuBg,(width*1.5+offset*2),height*0.51,width,height*1.02);
   image(logo,width*0.5,height*0.3,width*0.2,width*0.2);
-  textSize(32);
+  imageMode(CORNER);
+  image(playButton,width*0.02,height*0.15,width*0.04,width*0.04);
+  image(settingsButton,width*0.02,height*0.045,width*0.04,width*0.04);
+
+  if (mouseX > width*0.02 && mouseX < width*0.02 + width*0.04 &&
+    mouseY > height*0.15 && mouseY < height*0.15 + width*0.04) {
+  if (mouseIsPressed) {
+      songFrame = 0;
+      resetValues();
+      gameState = "play";
+    // Add action for play button here
+  }
+}
+
+// Check if mouse is over the settings button
+if (mouseX > width*0.02 && mouseX < width*0.02 + width*0.04 &&
+    mouseY > height*0.045 && mouseY < height*0.045 + width*0.04) {
+  if (mouseIsPressed) {
+    gameState="config"
+    // Add action for settings button here
+  } 
+  }
+  imageMode(CENTER);
   fill(255);
-  text("p to play", 10, 30);
-  text("c for config", 10, 60);
+  textSize(30);
+  text("c for config", width*0.08, height*0.1);
+  text("p to play", width*0.08, height*0.2);
+  
   //p
   if (keyIsDown(80)){
     if (gamestate = "menu" && frameCount>255){
@@ -107,17 +134,19 @@ function menu() {
     gameState="config";
   }
 
-  drawPlayer(playerState, width*0.5, height*1.16,height*0.4);
+  drawPlayer(playerState, width*0.5, height*1.16,height*0.4); 
+  drawBoss(width*0.8,height*1.16,height*0.4); 
   drawEnemy(0);
-  console.log("enemy was drawn")
   config_length = max(kValues.length,mValues.length)
   if (config_length < 8){
-    text("Select a keybind for the note " + int(config_length+1), 10, 90);
+    imageMode(CORNER);
+    text("Select a keybind for the note " + int(config_length+1), width*0.5, height*0.6);
     if(!hitSounds[config_length].isPlaying()){
       hitSounds[config_length].play();
     }
+    imageMode(CENTER);
   }
-
+  
   if (frameCount<255){
     background(0,0,0,255-frameCount);
     push();
@@ -180,8 +209,10 @@ function play() {
   text(score, 30, 50);
   
   //drawing hit circles/projectiles based on frame number
+  drawBoss(width*0.8,height*0.9,height*0.9);
   renderNotes();
   drawPlayer(playerState, width*0.25,height*0.9,height*0.9);
+  
 
   // process input hit timing
   checkLateNotes();
@@ -320,13 +351,31 @@ function drawPlayer(state="idle", x=0, y=0, size=500) {
   }
 }
 
+function drawBoss(x=0, y=0, size=500){
+  if(frameCount%5==0){
+    // console.log("Last state:",lastState," State:",state," Sprite:",animations[state][nextSprite]);
+    image(heliImages[nextBossSprite], x-size*0.6, y-size*0.98, size*1.2,size);
+    console.log(nextBossSprite);
+    nextBossSprite++;
+    if(nextBossSprite/13 >1){
+      nextBossSprite=0;
+    }
+  }else{
+    image(heliImages[nextBossSprite], x-size*0.6, y-size*0.98, size*1.2,size);
+  } 
+}
+
 function loadSprites() {
   images = []; //each img is 600x500 px
   for (let i = 0; i < 11; i++) {
-    images[i] = loadImage("assets/char/" + i + ".png");
+    images[i] = loadImage("assets/char/DELILAH/" + i + ".png");
+  }
+  heliImages=[];
+  for (let i = 0; i < 14; i++) {
+    heliImages[i] = loadImage("assets/char/HELI/" + i + ".png");
   }
   //for (let i = 0; i < 5; i++) {
-  slime = loadImage("assets\\Walk.gif");
+  slime = loadImage("assets/enemies/Walk.gif");
   //}
   miss = loadImage("assets/hit/0.png");
   ok = loadImage("assets/hit/50.png");
