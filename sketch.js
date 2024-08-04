@@ -99,8 +99,8 @@ function play() {
   imageMode(CENTER)
   background(200);
   offset=(-frameCount*2)%(width/2)
-  image(songBg,(width*0.5+offset),height*0.33,width*1.2,height*1.2);
-  image(songBg,(width*1.7+offset),height*0.33,width*1.2,height*1.2);
+  image(songBg,(width*0.5+offset),height*0.02,width*1.6,height*1.6);
+  image(songBg,(width*1.11+offset),height*0.02,width*1.6,height*1.6);
   
   imageMode(CORNER)
   background(0,0,0,100)
@@ -114,8 +114,8 @@ function play() {
   
   //draw fg elements
   imageMode(CENTER)
-  image(fg,(width*0.5+offset*2),height*0.5,width,height);
-  image(fg,(width*2.5+offset*2),height*0.5,width,height);
+  //image(fg,(width*0.5+offset*2),height*0.5,width,height);
+  //image(fg,(width*2.5+offset*2),height*0.5,width,height);
   imageMode(CORNER)
   //drawing hit circles/prjectiles based on frame number
   push();
