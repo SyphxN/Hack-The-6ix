@@ -105,6 +105,7 @@ function menu() {
   }
 
   drawPlayer(playerState, width*0.5, height*1.16,height*0.4);
+  drawEnemy(0);
   config_length = max(kValues.length,mValues.length)
   if (config_length < 8){
     text("Select a keybind for the note " + int(config_length+1), 10, 90);
@@ -112,6 +113,12 @@ function menu() {
       hitSounds[config_length].play();
     }
   }
+}
+
+function drawEnemy(enemy){
+  walk = enemyImages[enemy].splice(23,28);
+  
+  image(walk[frameCount], x-size*0.6, y-size*0.98, size*1.2,size);
 }
 
 function play() {
@@ -311,6 +318,12 @@ function loadSprites() {
   for (let i = 0; i < 11; i++) {
     images[i] = loadImage("assets/char/" + i + ".png");
   }
+  //for (let i = 0; i < 5; i++) {
+  enemyImages=[[],[],[],[],[],[]]
+  for (let j=0; j<29;j++){
+    enemyImages[0][j] = loadImage("assets/enemies/" + "0" + "/"+j+".png");
+  }
+  //}
   miss = loadImage("assets/hit/0.png");
   ok = loadImage("assets/hit/50.png");
   great = loadImage("assets/hit/100.png");
