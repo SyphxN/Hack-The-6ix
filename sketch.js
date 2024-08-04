@@ -51,6 +51,7 @@ function resetValues() {
 }
 function preload() {
   menuBg = loadImage("assets/menuBg.png");
+  logo = loadImage("assets/logo/mainlogo.png");
   loadSprites();
 
   // Return a promise that resolves when loadAssets() completes
@@ -89,13 +90,14 @@ function menu() {
   offset=(-frameCount)%(width/2)
   image(menuBg,(width*0.5+offset*2),height*0.51,width,height*1.02);
   image(menuBg,(width*1.5+offset*2),height*0.51,width,height*1.02);
+  image(logo,width*0.5,height*0.3,width*0.2,width*0.2);
   textSize(32);
   fill(255);
   text("p to play", 10, 30);
   text("c for config", 10, 60);
   //p
   if (keyIsDown(80)){
-    if (gamestate = "menu" && frameCount>120){
+    if (gamestate = "menu" && frameCount>255){
       songFrame = 0;
       resetValues();
       gameState = "play";
@@ -115,6 +117,14 @@ function menu() {
       hitSounds[config_length].play();
     }
   }
+
+  if (frameCount<255){
+    background(0,0,0,255-frameCount);
+    push();
+    textAlign(CENTER);
+    text("Loading...", width/2,height/2);
+    pop();
+  }
 }
 
 function drawEnemy(enemy){
@@ -125,11 +135,6 @@ function drawEnemy(enemy){
 }
 
 function play() {
-  if (songFrame > songLength + 120) {
-    gameState = "menu";
-    song.stop();
-  }
-
   //plays for first time
   if (!song.isPlaying()) {
     song.play();
@@ -185,15 +190,17 @@ function play() {
   checkLateNotes();
   processHitTiming();
 
-  if (healthValue <= 0) {
-    gameState = "menu";
-    song.stop();
-  } else if (healthValue > 100) {
+  if (healthValue > 100) {
     healthValue = 100;
   }
 
   // draw hit score
   drawScore();
+
+  if (songFrame > songLength + 120) {
+    gameState = "menu";
+    song.stop();
+  }
 
 }
 
@@ -441,13 +448,13 @@ function renderNotes(){
         continue;
       } else if (testNote-songFrame > 0 && testNote-songFrame < width/hitCircleSpeed) {
         stroke(0)
-        fill(189, 224, 254);
+        fill(	0, 175, 185);
         ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
         if (!notesOnScreen[i].includes(testNote)) notesOnScreen[i].push(testNote);
       } else if (testNote-songFrame > -10 && testNote-songFrame <= 0) { // transparent fade out
         alpha = map(testNote-songFrame, -10, 0, 0, 255);
-        fill(189, 224, 254,alpha);
-        stroke(0,alpha)
+        fill(0, 175, 185,alpha);
+        stroke(0, 175, 185,alpha)
         ellipse(width*0.35 + (testNote-songFrame)*hitCircleSpeed, height*0.15 + height*0.1*i, hitCircleSize, hitCircleSize);
       }
     }
@@ -491,7 +498,7 @@ function gameplayGUI(){
     //rect(width*0.35, rectHeight * (i+1), width, rectHeight);
     fill(colors[i]);
     if (currentNotesPressed.includes(i)) {
-      fill(255,0,0);
+      fill(240,113,103);
     }
     stroke(0);
     ellipse(width*0.35,height*0.1*i+height*0.15, 55, 55);
