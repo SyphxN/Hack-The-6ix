@@ -59,7 +59,7 @@ function draw() {
 function menu() {
   imageMode(CENTER)
   background(200);
-  offset=(-frameCount*5)%width
+  offset=(-frameCount)%(width/2)
   image(menuBg,(width*0.5+offset*2),height*0.51,width,height*1.02);
   image(menuBg,(width*1.5+offset*2),height*0.51,width,height*1.02);
   textSize(32);
@@ -98,7 +98,7 @@ function play() {
   }
   imageMode(CENTER)
   background(200);
-  offset=(-frameCount*2)%width
+  offset=(-frameCount*2)%(width/2)
   image(songBg,(width*0.5+offset),height*0.33,width*1.2,height*1.2);
   image(songBg,(width*1.7+offset),height*0.33,width*1.2,height*1.2);
   
