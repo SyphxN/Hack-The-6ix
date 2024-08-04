@@ -278,14 +278,17 @@ function keyReleased(){
 function inputPressed(note){ // merges both kb and midi input
   currentNotesPressed.push(note);
   // console.log("pressed: "+ note);
-  hitSounds[note].play();
+  if(note>=0){
+    hitSounds[note].play();
+  }
+  
 }
 
 function inputReleased(note){ // merges both kb and midi input
   currentNotesPressed = currentNotesPressed.filter(n => n != note);
   // console.log("released: "+ note);
   hitSounds[note].play;
-  // console.log(currentNotesPressed);
+
 }
 
 function renderNotes(){
