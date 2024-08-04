@@ -67,6 +67,13 @@ function menu() {
     gameState="config";
   }
   drawPlayer(playerState, mouseX, mouseY);
+  config_length = max(kValues.length,mValues.length)
+  if (config_length < 8){
+    text("Select a keybind for the note " + int(config_length+1), 10, 90);
+    if(!hitSounds[config_length].isPlaying()){
+      hitSounds[config_length].play();
+    }
+  }
 }
 
 function play() {
@@ -255,8 +262,6 @@ function handleMidiInput(input){
   if(noteEvent == 144){
     if (mValues.length<8 && !mValues.includes(note)){
       mValues.push(note);
-      console.log("meow");
-      text("meow", 10, 30);
       console.log(mValues);
     }
     if (!currentNotesPressed.includes(note)) {
