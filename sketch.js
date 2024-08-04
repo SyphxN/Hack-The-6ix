@@ -24,9 +24,10 @@ if (navigator.requestMIDIAccess){
   navigator.requestMIDIAccess().then(midiAccessAllowed,midiAccessDenied)
 }
 
-function keyConfig(lane,type,newKey){
-  config[lane][type]=newKey;
-}
+// Define the arrays for k and m values
+kValues = [48,49,50,51,52,53,54,55];
+mValues = [0, 1, 2, 3, 4, 5, 6, 7];
+hitSounds = [];
 
 function setup() {
   // fullscreen canvas
@@ -53,6 +54,11 @@ function draw() {
     case "play":
       play();
       break;
+    case "config":
+      kValues.splice(0, kValues.length);
+      mValues.splice(0,mValues.length);
+      gameState="menu";
+      break;
   }
 }
 
@@ -68,6 +74,12 @@ function menu() {
       songFrame = 0;
     }
     gameState = "play";
+  }
+  if (keyIsDown(51)){
+    print(kValues,mValues);
+  }
+  if (keyIsDown(50)){
+    gameState="config";
   }
 
   drawPlayer(playerState, mouseX, mouseY);
@@ -206,6 +218,15 @@ function preloadSong() {
   // preloadNotes = loadStrings("assets/song/notes.txt")
   jsonData = loadJSON("assets/song/map.json");
   bg = loadImage("assets/song/bg.jpg");
+  kick = loadSound("assets/drum_sounds/0.wav");
+  snare = loadSound("assets/drum_sounds/1.wav");
+  floorTom = loadSound("assets/drum_sounds/2.wav");
+  hi_hat = loadSound("assets/drum_sounds/3.wav");
+  crash = loadSound("assets/drum_sounds/4.wav");
+  high_tom = loadSound("assets/drum_sounds/5.wav");
+  open_hi_hat = loadSound("assets/drum_sounds/6.wav");
+  ride = loadSound("assets/drum_sounds/7.wav");
+  hitSounds = [kick,snare,floorTom,hi_hat,crash,high_tom,open_hi_hat,ride];
 }
 
 function loadSong(){ //secondary parse bc preloadSong() is async
@@ -234,38 +255,48 @@ function handleMidiInput(input){
   const noteEvent = input.data[0];
   const note = input.data[1];
   if(noteEvent == 144){
-    if (!currentNotesPressed.includes(note)) {
-      inputPressed(note);
+    if (mValues.length<8 && !mValues.includes(note)){
+      mValues.push(note);
+      console.log(mValues);
+    }
+    if (!currentNotes.includes(note)) {
+      inputPressed(mValues.indexOf(note));
     }
   } else  {
-    inputReleased(note);
+    inputReleased(mValues.indexOf(note));
   }
 }
 
 function keyPressed(){
   //if key from 1-8
-  if (keyCode >= 49 && keyCode <= 56){
-    inputPressed(keyCode-49);
+  if (kValues.length<8 && !kValues.includes(keyCode)){
+    kValues.push(keyCode);
+    console.log(kValues);
+  }
+  if (kValues.includes(keyCode)){
+    inputPressed(kValues.indexOf(keyCode));
   }
 }
 
 function keyReleased(){
     //if key from 1-8
-    if (keyCode >= 49 && keyCode <= 56){
-      inputReleased(keyCode-49);
+    if (kValues.includes(keyCode)){
+      inputReleased(kValues.indexOf(keyCode));
     }
-}
+  }
+
 
 function inputPressed(note){ // merges both kb and midi input
-  currentNotesPressed.push(note);
+  currentNotes.push(note);
   // console.log("pressed: "+ note);
-  // console.log(currentNotesPressed);
+  hitSounds[note].play();
 }
 
 function inputReleased(note){ // merges both kb and midi input
-  currentNotesPressed = currentNotesPressed.filter(n => n != note);
+  currentNotes = currentNotes.filter(n => n != note);
   // console.log("released: "+ note);
-  // console.log(currentNotesPressed);
+  hitSounds[note].play;
+  console.log(currentNotes);
 }
 
 function renderNotes(){
