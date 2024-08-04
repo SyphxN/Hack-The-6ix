@@ -94,7 +94,7 @@ function menu() {
   text("c for config", 10, 60);
   //p
   if (keyIsDown(80)){
-    if (gamestate = "menu" && frameCount>120){
+    if (gamestate = "menu" && frameCount>255){
       songFrame = 0;
       resetValues();
       gameState = "play";
@@ -111,6 +111,14 @@ function menu() {
     if(!hitSounds[config_length].isPlaying()){
       hitSounds[config_length].play();
     }
+  }
+
+  if (frameCount<255){
+    background(0,0,0,255-frameCount);
+    push();
+    textAlign(CENTER);
+    text("Loading...", width/2,height/2);
+    pop();
   }
 }
 
@@ -175,10 +183,7 @@ function play() {
   checkLateNotes();
   processHitTiming();
 
-  if (healthValue <= 0) {
-    gameState = "menu";
-    song.stop();
-  } else if (healthValue > 100) {
+  if (healthValue > 100) {
     healthValue = 100;
   }
 
