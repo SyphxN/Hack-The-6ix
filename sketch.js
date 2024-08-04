@@ -94,11 +94,11 @@ function menu() {
   text("c for config", 10, 60);
   //p
   if (keyIsDown(80)){
-    if (gamestate = "menu"){
+    if (gamestate = "menu" && frameCount>120){
       songFrame = 0;
+      resetValues();
+      gameState = "play";
     }
-    resetValues();
-    gameState = "play";
   }
   if (keyIsDown(67)){
     gameState="config";
@@ -500,4 +500,8 @@ function gameplayGUI(){
 
 function midiAccessDenied(){
   console.log("Could not connect to any midi device.")
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
