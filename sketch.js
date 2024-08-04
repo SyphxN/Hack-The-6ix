@@ -54,20 +54,16 @@ function draw() {
 function menu() {
   background(120);
   textSize(32);
-  text("1 for low", 10, 30);
-  text("2 for medium", 10, 60);
-  text("3 for high", 10, 90);
-  //1 is pressed
-  if (keyIsDown(49)){
+  text("p to play", 10, 30);
+  text("c for config", 10, 60);
+  //p
+  if (keyIsDown(80)){
     if (gamestate = "menu"){
       songFrame = 0;
     }
     gameState = "play";
   }
-  if (keyIsDown(51)){
-    print(kValues,mValues);
-  }
-  if (keyIsDown(50)){
+  if (keyIsDown(67)){
     gameState="config";
   }
 
@@ -121,6 +117,7 @@ function checkLateNotes() {
 function processHitTiming() {
   if (currentNotesPressed.length > 0 && notesOnScreen[currentNotesPressed[0]].length > 0) {
     while (currentNotesPressed.length > 0) {
+      console.log("currentNotesPressed[0]: ", currentNotesPressed[0]);
       let score = calculateScore(songFrame, currentNotesPressed[0], notesOnScreen[currentNotesPressed[0]][0])
       // console.log("score: ", score);
       renderFeedback(score);
@@ -199,7 +196,10 @@ function loadSprites() {
   for (let i = 0; i < 11; i++) {
     images[i] = loadImage("assets/char/" + i + ".png");
   }
-  
+  miss = loadImage("assets/hit/0.png");
+  ok = loadImage("assets/hit/50.png");
+  great = loadImage("assets/hit/100.png");
+  amazing = loadImage("assets/hit/300.png");
 }
 
 function preloadSong() {
@@ -285,7 +285,7 @@ function inputReleased(note){ // merges both kb and midi input
   currentNotesPressed = currentNotesPressed.filter(n => n != note);
   // console.log("released: "+ note);
   hitSounds[note].play;
-  console.log(currentNotesPressed);
+  // console.log(currentNotesPressed);
 }
 
 function renderNotes(){
@@ -318,29 +318,30 @@ function renderNotes(){
 
 function renderFeedback(feedback) {
   if (feedback == 0) {
-    scoreFeedback = ['0', 60];
+    scoreFeedback = [miss, 60];
   } else if (feedback == 50) {
-    scoreFeedback = ['50', 60];
+    scoreFeedback = [ok, 60];
   } else if (feedback == 100) {
-    scoreFeedback = ['100', 60];
+    scoreFeedback = [great, 60];
   } else if (feedback == 300) {
-    scoreFeedback = ['300', 60];
+    scoreFeedback = [amazing, 60];
   }
 }
 
 function drawScore() {
+  imageMode(CENTER);
   if (scoreFeedback[1] > 30) {
     fill(0);
     stroke(0);
-    text(scoreFeedback[0], width*0.5, height*0.5);
+    image(scoreFeedback[0], width*0.5, height*0.5,250,100);
     scoreFeedback[1]--;
   } else if (scoreFeedback[1] > 0) {
-    console.log(scoreFeedback[1]*255 / 60);
     fill(0, 0, 0, scoreFeedback[1]*255 / 60);
     stroke(0, 0, 0, scoreFeedback[1]*255 / 60);
-    text(scoreFeedback[0], width*0.5, height*0.5);
+    image(scoreFeedback[0], width*0.5, height*0.5,250,100);
     scoreFeedback[1]--;
   }
+  imageMode(CORNER)
 }
 
 function gameplayGUI(){
@@ -360,34 +361,4 @@ function gameplayGUI(){
 
 function midiAccessDenied(){
   console.log("Could not connect to any midi device.")
-}
-
-function makeShadow(img, sigma, shadowColor, opacity) {
-  // Gaussian goes to approx. 0 at 3sigma
-  // away from the mean; pad image with
-  // 3sigma on all sides to give space
-  const newW = img.width + 6 * sigma;
-  const newH = img.height + 6 * sigma;
-  const g = createGraphics(newW, newH);
-  
-  g.imageMode(CENTER);
-  g.translate(newW/2, newH/2);
-  //g.tint(0, 0, 0, );
-  g.image(img, 0, 0);
-  g.filter(BLUR, sigma);
-  
-  const shadow = g.get();
-  const c = color(shadowColor);
-  shadow.loadPixels();
-  const numVals = 4 * shadow.width * shadow.height;
-  for (let i = 0; i < numVals; i+=4) {
-    shadow.pixels[i + 0] = c.levels[0];
-    shadow.pixels[i + 1] = c.levels[1];
-    shadow.pixels[i + 2] = c.levels[2];
-    shadow.pixels[i + 3] *= opacity;
-  }
-  shadow.updatePixels();
-  
-  g.remove();
-  return shadow;
 }
